@@ -115,7 +115,7 @@ def process_file(
                 "intent": intent,
                 "priority_level": priority,
                 "hazards_identified": hazards,
-                "resources_requested": resources,
+                "resources": resources,
             },
         }
         formatted_data.append(structured_record)
@@ -130,8 +130,7 @@ def process_file(
         output_json_path.parent.mkdir(parents=True, exist_ok=True)
 
         with open(output_json_path, "w", encoding="utf-8") as f:
-            for item in formatted_data:
-                f.write(json.dumps(item) + "\n")
+            json.dump(formatted_data, f, indent=4, ensure_ascii=False)
 
         elapsed_time = time.time() - start_time
         logger.info(
@@ -152,7 +151,7 @@ if __name__ == "__main__":
         logger.warning(f"No CSV files found in {DATA_DIR.absolute()}")
 
     for p in csv_file_paths:
-        output_json_path = DATA_DIR / "structured" / f"{p.stem}.jsonl"
+        output_json_path = DATA_DIR / "structured" / f"{p.stem}.json"
 
         logger.info(f"Starting processing for: {p.name}")
         process_file(csv_path=p, output_json_path=output_json_path)
