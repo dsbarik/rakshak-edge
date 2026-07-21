@@ -1,11 +1,32 @@
-# 🛡️ Rakshak Edge
+<div align="center">
+  <h1>🛡️ Rakshak Edge</h1>
+  <p><strong>Agentic disaster message triage: parse, verify, and prioritize emergency SMS from the field.</strong></p>
 
-**Agentic disaster message triage: parse, verify, and prioritize emergency SMS from the field.**
+  <p>
+    <a href="https://python.org">
+      <img src="https://img.shields.io/badge/python-3.12-blue?logo=python&logoColor=white" alt="Python 3.12">
+    </a>
+    <a href="https://www.langchain.com/langgraph">
+      <img src="https://img.shields.io/badge/LangGraph-1.2.9-7C3AED?logo=langchain&logoColor=white" alt="LangGraph">
+    </a>
+    <a href="LICENSE">
+      <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
+    </a>
+    <img src="https://img.shields.io/badge/status-production--ready-22c55e" alt="Status">
+  </p>
 
-[![Python 3.12](https://img.shields.io/badge/python-3.12-blue?logo=python&logoColor=white)](https://python.org)
-[![LangGraph](https://img.shields.io/badge/LangGraph-1.2.9-7C3AED?logo=langchain&logoColor=white)](https://www.langchain.com/langgraph)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-![](https://img.shields.io/badge/status-production--ready-22c55e)
+  <br>
+
+  <p>
+    <a href="#-what-it-does">What It Does</a> •
+    <a href="#-architecture">Architecture</a> •
+    <a href="#-evaluation">Evaluation</a> •
+    <a href="#-results">Results</a> •
+    <a href="#-getting-started">Getting Started</a>
+  </p>
+</div>
+
+<br>
 
 ---
 
@@ -17,25 +38,38 @@ Rakshak Edge turns raw messages into structured triage data. It identifies hazar
 
 It runs as a LangGraph state machine with an LLM-as-judge verification loop that catches hallucinations before they reach operations.
 
-> _"We are dying of hunger and thirst, please send help."_
-> _"People are trapped under collapsed buildings after the earthquake."_
-> _"The hospital has no power and we need generators."_
+<br>
+
+<table>
+  <tr>
+    <td><i>"We are dying of hunger and thirst, please send help."</i></td>
+    <td><b>Requests</b> food and water</td>
+  </tr>
+  <tr>
+    <td><i>"People are trapped under collapsed buildings after the earthquake."</i></td>
+    <td><b>Requests</b> search and rescue + medical help</td>
+  </tr>
+  <tr>
+    <td><i>"The hospital has no power and we need generators."</i></td>
+    <td><b>Requests</b> electricity</td>
+  </tr>
+</table>
 
 ---
 
 ## ✨ Example
 
-| Input                                                                  | Output                                                                                                                                                                                                                          |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _"People are trapped under collapsed buildings after the earthquake."_ | `{"intent": "REQUEST", "hazards": [{"type": "EARTHQUAKE", "severity": 4}, {"type": "STRUCTURAL_DAMAGE", "severity": 4}], "resources": [{"type": "SEARCH_AND_RESCUE", "severity": 4}, {"type": "MEDICAL_HELP", "severity": 4}]}` |
-| _"We are dying of hunger and thirst, please send help."_               | `{"intent": "REQUEST", "hazards": [], "resources": [{"type": "WATER", "severity": 4}, {"type": "FOOD", "severity": 4}]}`                                                                                                        |
-| _"We have two trucks available to transport supplies."_                | `{"intent": "OFFER", "hazards": [], "resources": [{"type": "TRANSPORT", "severity": 2}]}`                                                                                                                                       |
+| Input | Output |
+| --- | --- |
+| <i>"People are trapped under collapsed buildings after the earthquake."</i> | <code>{"intent": "REQUEST", "hazards": [{"type": "EARTHQUAKE", "severity": 4}, {"type": "STRUCTURAL_DAMAGE", "severity": 4}], "resources": [{"type": "SEARCH_AND_RESCUE", "severity": 4}, {"type": "MEDICAL_HELP", "severity": 4}]}</code> |
+| <i>"We are dying of hunger and thirst, please send help."</i> | <code>{"intent": "REQUEST", "hazards": [], "resources": [{"type": "WATER", "severity": 4}, {"type": "FOOD", "severity": 4}]}</code> |
+| <i>"We have two trucks available to transport supplies."</i> | <code>{"intent": "OFFER", "hazards": [], "resources": [{"type": "TRANSPORT", "severity": 2}]}</code> |
 
 ---
 
 ## 🏗️ Architecture
 
-```
+<pre>
                       ┌──────────────┐
                       │   MESSAGE    │
                       │  (raw SMS)   │
@@ -66,25 +100,57 @@ It runs as a LangGraph state machine with an LLM-as-judge verification loop that
                       │  (structured │
                       │   triage)    │
                       └──────────────┘
-```
+</pre>
 
 ### Pipeline Nodes
 
-| Node           | Responsibility                                                                                                                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Parse**      | Classifies intent (`REQUEST` / `OFFER` / `OTHER`). Extracts hazards (`EARTHQUAKE`, `FLOOD`, `FIRE`) and resources (`FOOD`, `WATER`, `MEDICAL_HELP`) with severity levels (1-4).                   |
-| **Verify**     | LLM-as-judge QA gate. Checks for contradictions, wrong intent, spurious categories, and hazard/resource confusion. Designed to be conservative: only flag clear errors to avoid false rejections. |
-| **Retry**      | Loops back to Parse when verification fails. Keeps accumulated context. Configurable max attempts prevents infinite waste.                                                                        |
-| **Prioritize** | Computes overall priority (`LOW` / `HIGH` / `CRITICAL`) from intent + max severity.                                                                                                               |
+<table>
+  <tr>
+    <th>Node</th>
+    <th>Responsibility</th>
+  </tr>
+  <tr>
+    <td><b>Parse</b></td>
+    <td>Classifies intent (<code>REQUEST</code> / <code>OFFER</code> / <code>OTHER</code>). Extracts hazards (<code>EARTHQUAKE</code>, <code>FLOOD</code>, <code>FIRE</code>) and resources (<code>FOOD</code>, <code>WATER</code>, <code>MEDICAL_HELP</code>) with severity levels (1-4).</td>
+  </tr>
+  <tr>
+    <td><b>Verify</b></td>
+    <td>LLM-as-judge QA gate. Checks for contradictions, wrong intent, spurious categories, and hazard/resource confusion. Designed to be conservative: only flag clear errors to avoid false rejections.</td>
+  </tr>
+  <tr>
+    <td><b>Retry</b></td>
+    <td>Loops back to Parse when verification fails. Keeps accumulated context. Configurable max attempts prevents infinite waste.</td>
+  </tr>
+  <tr>
+    <td><b>Prioritize</b></td>
+    <td>Computes overall priority (<code>LOW</code> / <code>HIGH</code> / <code>CRITICAL</code>) from intent + max severity.</td>
+  </tr>
+</table>
 
 ### Key Design Decisions
 
-| Decision                         | Rationale                                                                                                                                          |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **LangGraph over raw LangChain** | State machine models the parse -> verify -> retry loop. Gives explicit state transitions and history tracking.                                     |
-| **LLM-as-judge verification**    | Lightweight QA gate catches contradictions before they reach downstream systems. No human-in-the-loop needed.                                      |
-| **Conservative verifier**        | Earlier versions wasted ~80% of retries by demanding severity upgrades for food/water mentions. Current verifier only flags direct contradictions. |
-| **Config-driven model swapping** | All model parameters live in one YAML file. Swap from `phi4-mini` to `gemma4` to `minimax-m3` without touching pipeline code.                      |
+<table>
+  <tr>
+    <th>Decision</th>
+    <th>Rationale</th>
+  </tr>
+  <tr>
+    <td><b>LangGraph over raw LangChain</b></td>
+    <td>State machine models the parse -> verify -> retry loop. Gives explicit state transitions and history tracking.</td>
+  </tr>
+  <tr>
+    <td><b>LLM-as-judge verification</b></td>
+    <td>Lightweight QA gate catches contradictions before they reach downstream systems. No human-in-the-loop needed.</td>
+  </tr>
+  <tr>
+    <td><b>Conservative verifier</b></td>
+    <td>Earlier versions wasted ~80% of retries by demanding severity upgrades for food/water mentions. Current verifier only flags direct contradictions.</td>
+  </tr>
+  <tr>
+    <td><b>Config-driven model swapping</b></td>
+    <td>All model parameters live in one YAML file. Swap from <code>phi4-mini</code> to <code>gemma4</code> to <code>minimax-m3</code> without touching pipeline code.</td>
+  </tr>
+</table>
 
 ---
 
@@ -95,12 +161,12 @@ Every prompt change is tested against a golden reference dataset with structured
 ### Golden Dataset
 
 - **50 real SMS messages** from the 2010 Haiti earthquake. Includes requests, offers, and updates across English, Creole, and mixed-language texts with truncation and noise.
-- **Reference annotations** generated by `minimax-m3:cloud` (428B parameter model). Uses an identical prompt template to the pipeline. This ensures we measure model capability, not prompt mismatch.
-- Gold standard is **provider-agnostic**. Can be regenerated from Gemini 3.1 Pro, GPT-5, or any stronger model by changing one line in `generate_golden.py`.
+- **Reference annotations** generated by <code>minimax-m3:cloud</code> (428B parameter model). Uses an identical prompt template to the pipeline. This ensures we measure model capability, not prompt mismatch.
+- Gold standard is **provider-agnostic**. Can be regenerated from Gemini 3.1 Pro, GPT-5, or any stronger model by changing one line in <code>generate_golden.py</code>.
 
 ### Metrics
 
-```
+<pre>
                   ┌─────────────────────────────────┐
                   │       Pipeline Output           │
                   │  (gemma4:cloud, phi4-mini, etc.)│
@@ -119,54 +185,159 @@ Every prompt change is tested against a golden reference dataset with structured
                   │      Golden Reference           │
                   │  (minimax-m3:cloud annotations) │
                   └─────────────────────────────────┘
-```
+</pre>
 
-Exact match is too harsh for multi-label extraction. Predicting `[FOOD, WATER]` when golden has `[FOOD, WATER, SHELTER]` is partially correct. Subset matching (`pipeline in reference`) separates precision from recall and gives a more honest picture.
+Exact match is too harsh for multi-label extraction. Predicting <code>[FOOD, WATER]</code> when golden has <code>[FOOD, WATER, SHELTER]</code> is partially correct. Subset matching (<code>pipeline ⊆ reference</code>) separates precision from recall and gives a more honest picture.
 
 ---
 
 ## 📊 Results
 
-Pipeline: `gemma4:cloud` (20B) | Golden: `minimax-m3:cloud` (428B) | Samples: 50
+Pipeline: <code>gemma4:cloud</code> (20B) | Golden: <code>minimax-m3:cloud</code> (428B) | Samples: 50
 
 ### Overall
 
-| Metric   | Intent    | Hazards   | Resources |
-| -------- | --------- | --------- | --------- |
-| Accuracy | **88.0%** | **98.0%** | **90.0%** |
+<table>
+  <tr>
+    <th>Metric</th>
+    <th>Intent</th>
+    <th>Hazards</th>
+    <th>Resources</th>
+  </tr>
+  <tr>
+    <td><b>Accuracy</b></td>
+    <td><b>88.0%</b></td>
+    <td><b>98.0%</b></td>
+    <td><b>90.0%</b></td>
+  </tr>
+</table>
 
 ### Per-Category Breakdown
 
-#### Resources
+<table>
+  <tr>
+    <th colspan="4">Resources</th>
+  </tr>
+  <tr>
+    <th>Category</th>
+    <th>Precision</th>
+    <th>Recall</th>
+    <th>Samples</th>
+  </tr>
+  <tr>
+    <td>FOOD</td>
+    <td>100.0%</td>
+    <td>96.2%</td>
+    <td>26</td>
+  </tr>
+  <tr>
+    <td>WATER</td>
+    <td>100.0%</td>
+    <td>94.7%</td>
+    <td>19</td>
+  </tr>
+  <tr>
+    <td>MEDICAL_HELP</td>
+    <td>90.9%</td>
+    <td>100.0%</td>
+    <td>11</td>
+  </tr>
+  <tr>
+    <td>SHELTER</td>
+    <td>100.0%</td>
+    <td>83.3%</td>
+    <td>6</td>
+  </tr>
+  <tr>
+    <td>SEARCH_AND_RESCUE</td>
+    <td>50.0%</td>
+    <td>100.0%</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>CLOTHING</td>
+    <td>100.0%</td>
+    <td>100.0%</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>ELECTRICITY</td>
+    <td>100.0%</td>
+    <td>100.0%</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>TRANSPORT</td>
+    <td>50.0%</td>
+    <td>100.0%</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>SECURITY_PERSONNEL</td>
+    <td>100.0%</td>
+    <td>100.0%</td>
+    <td>1</td>
+  </tr>
+</table>
 
-| Category           | Precision | Recall | Samples |
-| ------------------ | --------- | ------ | ------- |
-| FOOD               | 100.0%    | 96.2%  | 26      |
-| WATER              | 100.0%    | 94.7%  | 19      |
-| MEDICAL_HELP       | 90.9%     | 100.0% | 11      |
-| SHELTER            | 100.0%    | 83.3%  | 6       |
-| SEARCH_AND_RESCUE  | 50.0%     | 100.0% | 4       |
-| CLOTHING           | 100.0%    | 100.0% | 1       |
-| ELECTRICITY        | 100.0%    | 100.0% | 1       |
-| TRANSPORT          | 50.0%     | 100.0% | 2       |
-| SECURITY_PERSONNEL | 100.0%    | 100.0% | 1       |
+<br>
 
-#### Hazards
-
-| Category              | Precision | Recall | Samples |
-| --------------------- | --------- | ------ | ------- |
-| EARTHQUAKE            | 100.0%    | 100.0% | 1       |
-| SECURITY_THREAT       | 100.0%    | 100.0% | 2       |
-| STRUCTURAL_DAMAGE     | 100.0%    | 100.0% | 1       |
-| COMMUNICATION_FAILURE | 75.0%     | 100.0% | 4       |
+<table>
+  <tr>
+    <th colspan="4">Hazards</th>
+  </tr>
+  <tr>
+    <th>Category</th>
+    <th>Precision</th>
+    <th>Recall</th>
+    <th>Samples</th>
+  </tr>
+  <tr>
+    <td>EARTHQUAKE</td>
+    <td>100.0%</td>
+    <td>100.0%</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>SECURITY_THREAT</td>
+    <td>100.0%</td>
+    <td>100.0%</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>STRUCTURAL_DAMAGE</td>
+    <td>100.0%</td>
+    <td>100.0%</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>COMMUNICATION_FAILURE</td>
+    <td>75.0%</td>
+    <td>100.0%</td>
+    <td>4</td>
+  </tr>
+</table>
 
 ### Verification Efficiency
 
-| Metric                           | Value                          |
-| -------------------------------- | ------------------------------ |
-| Avg retries per message          | **0.24**                       |
-| Retries exhausted (max 3)        | 4 / 50                         |
-| Reduction from previous verifier | **~80% fewer wasted attempts** |
+<table>
+  <tr>
+    <th>Metric</th>
+    <th>Value</th>
+  </tr>
+  <tr>
+    <td>Avg retries per message</td>
+    <td><b>0.24</b></td>
+  </tr>
+  <tr>
+    <td>Retries exhausted (max 3)</td>
+    <td>4 / 50</td>
+  </tr>
+  <tr>
+    <td>Reduction from previous verifier</td>
+    <td><b>~80% fewer wasted attempts</b></td>
+  </tr>
+</table>
 
 ---
 
@@ -174,13 +345,13 @@ Pipeline: `gemma4:cloud` (20B) | Golden: `minimax-m3:cloud` (428B) | Samples: 50
 
 The most impactful optimization came from treating prompts as testable hypotheses.
 
-**Problem**: The model hallucinated `HEALTH_CRISIS` as a hazard in every message mentioning hunger, thirst, or injury. This caused 48% false negatives on resource extraction for those cases.
+**Problem**: The model hallucinated <code>HEALTH_CRISIS</code> as a hazard in every message mentioning hunger, thirst, or injury. This caused 48% false negatives on resource extraction for those cases.
 
-**Root Cause**: `HEALTH_CRISIS` was dual-classified as both a hazard and implicitly referenced by resource needs (food, water, medical help). The model learned to use it as a catch-all.
+**Root Cause**: <code>HEALTH_CRISIS</code> was dual-classified as both a hazard and implicitly referenced by resource needs (food, water, medical help). The model learned to use it as a catch-all.
 
-**Fix**: Removed `HEALTH_CRISIS` from the hazard ontology entirely. Added explicit instruction:
+**Fix**: Removed <code>HEALTH_CRISIS</code> from the hazard ontology entirely. Added explicit instruction:
 
-> _"Hunger, thirst, injury, illness, and dying people are NOT hazards. These are consequences that should be reflected in resource needs."_
+> <i>"Hunger, thirst, injury, illness, and dying people are NOT hazards. These are consequences that should be reflected in resource needs."</i>
 
 **Validation**: Ran the full comparison engine before deploying. Hazard accuracy went from marginal to 98%. Resource accuracy stabilized at 90%. Retries dropped by 80%. All numbers measured against the golden dataset.
 
@@ -191,8 +362,8 @@ The most impactful optimization came from treating prompts as testable hypothese
 ### Prerequisites
 
 - Python 3.12+
-- [uv](https://docs.astral.sh/uv/) (fast Python package manager)
-- [Ollama](https://ollama.com/) with a model pulled (e.g., `gemma4:cloud` or `phi4-mini`)
+- <a href="https://docs.astral.sh/uv/">uv</a> (fast Python package manager)
+- <a href="https://ollama.com/">Ollama</a> with a model pulled (e.g., <code>gemma4:cloud</code> or <code>phi4-mini</code>)
 
 ### Setup
 
@@ -244,7 +415,7 @@ nodes:
 
 ## 📁 Project Structure
 
-```
+<pre>
 rakshak-edge/
 ├── src/rakshak_edge/         # Core pipeline
 │   ├── graph.py              # LangGraph state machine
@@ -257,7 +428,7 @@ rakshak-edge/
 │   └── main.py               # CLI entry point
 ├── scripts/                  # Evaluation & data tools
 │   ├── generate_golden.py    # Golden annotation generation
-│   ├── compare_golden.py     # Golden vs. pipeline comparison engine
+│   ├── compare_golden.py     # Golden vs pipeline comparison engine
 │   ├── prepare_datasets.py   # CSV -> JSON preprocessing
 │   └── dataset_analysis.py   # Dataset exploration
 ├── data/
@@ -267,21 +438,21 @@ rakshak-edge/
 ├── configs/
 │   └── base.yaml             # Model + node configuration
 └── pyproject.toml
-```
+</pre>
 
 ---
 
 ## 🛠️ Built With
 
-- **Python 3.12** + [uv](https://docs.astral.sh/uv/) for fast dependency management
-- **[LangGraph](https://www.langchain.com/langgraph)** for state machine orchestration
-- **[LangChain](https://www.langchain.com/)** for LLM integration and prompt templating
-- **[Pydantic](https://docs.pydantic.dev/)** for structured output parsing
-- **[Ollama](https://ollama.com/)** for local LLM inference
-- **[Rich](https://rich.readthedocs.io/)** for CLI output formatting
+- <b>Python 3.12</b> + <a href="https://docs.astral.sh/uv/">uv</a> for fast dependency management
+- <b><a href="https://www.langchain.com/langgraph">LangGraph</a></b> for state machine orchestration
+- <b><a href="https://www.langchain.com/">LangChain</a></b> for LLM integration and prompt templating
+- <b><a href="https://docs.pydantic.dev/">Pydantic</a></b> for structured output parsing
+- <b><a href="https://ollama.com/">Ollama</a></b> for local LLM inference
+- <b><a href="https://rich.readthedocs.io/">Rich</a></b> for CLI output formatting
 
 ---
 
 ## 📄 License
 
-MIT [Dibya S. Barik](mailto:barikdibyasamapd@gmail.com)
+MIT · <a href="mailto:barikdibyasamapd@gmail.com">Dibya S. Barik</a>
