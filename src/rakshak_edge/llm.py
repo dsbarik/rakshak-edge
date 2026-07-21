@@ -11,6 +11,4 @@ def get_llm() -> ChatOllama:
     if settings.get("base_url"):
         kwargs["base_url"] = settings["base_url"]
 
-    llm = ChatOllama(**kwargs)
-
-    return llm
+    return ChatOllama(**kwargs)

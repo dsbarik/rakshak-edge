@@ -23,4 +23,8 @@ def setup_logger():
 
     logger.addHandler(console_handler)
 
+    # Suppress noisy third-party HTTP loggers
+    for noisy in ("httpx", "httpx._client", "httpx._transport", "httpcore", "httpcore.http11"):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
+
     return logger

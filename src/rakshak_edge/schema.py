@@ -1,32 +1,44 @@
+import enum
 from typing import List, Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, AliasChoices
 
 
-class TriageOutput(BaseModel):
-    intent: Literal["OFFER", "REQUEST", "OTHER"] = Field(
-        description="The primary purpose of the message. 'REQUEST' for seeking help, 'OFFER' for providing help, or 'OTHER'."
+class Priority(enum.IntEnum):
+    LOW = 1
+    HIGH = 2
+    CRITICAL = 3
+
+
+class Severity(enum.IntEnum):
+    MILD = 1
+    MODERATE = 2
+    SEVERE = 3
+    EXTREME = 4
+
+
+class Hazard(BaseModel):
+    # ponytail: accept type/hazard/name — Gemma uses different field names per message
+    name: str = Field(
+        serialization_alias="type",
+        validation_alias=AliasChoices("type", "hazard", "name"),
     )
-    priority_level: Literal["CRITICAL", "HIGH", "LOW"] = Field(
-        description="Urgency level. Use 'CRITICAL' for search/rescue or medical help. Use 'HIGH' if any hazards or basic resources are mentioned. Default to 'LOW'."
-    )
-    hazards_identified: List[
-        Literal["FLOODS", "STORM", "EARTHQUAKE", "FIRE", "COLD"]
-    ] = Field(
-        default_factory=list,
-        description="Identify any hazards mentioned in the text. Must exactly match the provided categories. Leave empty if none.",
-    )
-    resources: List[Literal["WATER", "FOOD", "SHELTER", "MEDICAL_HELP", "CLOTHING"]] = (
-        Field(
-            default_factory=list,
-            description="Identify specific resources mentioned. Must exactly match the provided categories. Leave empty if none.",
-        )
-    )
+    severity: Severity
 
-    @model_validator(mode="after")
-    def enforce_intent_logic(self) -> "TriageOutput":
 
-        if self.intent == "OFFER":
-            self.hazards_identified = []
+class Resource(BaseModel):
+    name: str = Field(
+        serialization_alias="type",
+        validation_alias=AliasChoices("type", "resource", "name"),
+    )
+    severity: Severity
 
-        return self
+
+class ParsedMessage(BaseModel):
+    intent: Literal["REQUEST", "OFFER", "OTHER"]
+    hazards: List[Hazard]
+    resources: List[Resource]
+
+
+class TriageOutput(ParsedMessage):
+    priority_level: Priority

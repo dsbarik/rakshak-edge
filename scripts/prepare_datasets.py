@@ -78,29 +78,36 @@ def process_file(
         elif row.get("request") == 1:
             intent = "REQUEST"
 
-        # Hazard Mapping
-        if row.get("floods") == 1:
-            hazards.append("FLOODS")
-        if row.get("storm") == 1:
-            hazards.append("STORM")
-        if row.get("earthquake") == 1:
-            hazards.append("EARTHQUAKE")
-        if row.get("fire") == 1:
-            hazards.append("FIRE")
-        if row.get("cold") == 1:
-            hazards.append("COLD")
+        # Hazard Mapping (core + expanded)
+        hazard_map = {
+            "floods": "FLOODS",
+            "storm": "STORM",
+            "earthquake": "EARTHQUAKE",
+            "fire": "FIRE",
+            "cold": "COLD",
+            "security": "SECURITY_THREAT",
+            "buildings": "STRUCTURAL_DAMAGE",
+            "electricity": "POWER_OUTAGE",
+        }
+        for col, label in hazard_map.items():
+            if row.get(col) == 1:
+                hazards.append(label)
 
-        # Resource Mapping
-        if row.get("water") == 1:
-            resources.append("WATER")
-        if row.get("food") == 1:
-            resources.append("FOOD")
-        if row.get("shelter") == 1:
-            resources.append("SHELTER")
-        if row.get("medical_help") == 1:
-            resources.append("MEDICAL_HELP")
-        if row.get("clothing") == 1:
-            resources.append("CLOTHING")
+        # Resource Mapping (core + expanded)
+        resource_map = {
+            "water": "WATER",
+            "food": "FOOD",
+            "shelter": "SHELTER",
+            "medical_help": "MEDICAL_HELP",
+            "clothing": "CLOTHING",
+            "search_and_rescue": "SEARCH_AND_RESCUE",
+            "transport": "TRANSPORT",
+            "money": "OTHER",
+            "tools": "OTHER",
+        }
+        for col, label in resource_map.items():
+            if row.get(col) == 1:
+                resources.append(label)
 
         # Priority Derivation
         priority = "LOW"

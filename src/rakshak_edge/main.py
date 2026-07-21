@@ -2,40 +2,42 @@ import json
 import logging
 from pathlib import Path
 
-from rakshak_edge.llm import get_llm
-from rakshak_edge.prompts import final_prompt
+from rakshak_edge.graph import graph
 from rakshak_edge.schema import TriageOutput
+from rakshak_edge.state import TriageState
 from rakshak_edge.utils.logger import setup_logger
 
 setup_logger()
 logger = logging.getLogger(__name__)
 
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = ROOT_DIR / "data"
-DATA_PATH = DATA_DIR / "structured" / "disaster_response_messages_training.json"
+DATA_PATH = (
+    ROOT_DIR / "data" / "structured" / "disaster_response_messages_training.json"
+)
 
 
-llm = get_llm()
+def triage(message: str) -> TriageOutput:
+    initial: TriageState = {"message": message, "retry_count": 0}
+    result = graph.invoke(initial)
+    return result["output"]
 
-structured_llm = llm.with_structured_output(schema=TriageOutput)
 
+if __name__ == "__main__":
+    if not DATA_PATH.exists():
+        raise FileNotFoundError(f"File not found: {DATA_PATH}")
 
-if not DATA_PATH.exists():
-    logger.error(f"File does not exist at: {DATA_PATH.absolute()}")
-    raise FileNotFoundError(f"Error: Filde does not exist at: {DATA_PATH.absolute()}")
+    messages = json.loads(DATA_PATH.read_text())
 
-with open(DATA_PATH, "r") as file:
-    messages = json.load(file)
+    for msg in messages[:10]:
+        output = triage(msg["input_text"])
 
-input_text = messages[0]["input_text"]
+        output_dict = {
+            "intent": output.intent,
+            "priority_level": output.priority_level.name,
+            "hazards_identified": [h.name for h in output.hazards],
+            "resources": [r.name for r in output.resources],
+        }
 
-chain = final_prompt | structured_llm
-
-response: TriageOutput = chain.invoke({"input_text": input_text})  # type: ignore
-
-print()
-logger.info(f"{input_text=}")
-logger.info("Actual Output:")
-logger.info(response.model_dump())
-logger.info("Expected Output:")
-logger.info(messages[0]["expected_output"])
+        logger.info("Input: %s", msg["input_text"])
+        logger.info("Output: %s\n\n", output_dict)
+        # logger.info("Expected: %s\n\n", msg["expected_output"])

@@ -2,3 +2,6 @@ llm:
   model_name: "gemma4:cloud"
   temperature: 0.0
   use_auth: true
+
+nodes:
+  max_retries: 3
