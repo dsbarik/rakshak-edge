@@ -194,7 +194,7 @@ Exact match is too harsh for multi-label extraction. Predicting <code>[FOOD, WAT
 
 ## 📊 Results
 
-Pipeline: <code>gemma4:cloud</code> (20B) | Golden: <code>minimax-m3:cloud</code> (428B) | Samples: 50
+Pipeline: <code>gemma4:cloud</code> (31B) | Golden: <code>minimax-m3:cloud</code> (428B) | Samples: 50
 
 ### Overall
 
