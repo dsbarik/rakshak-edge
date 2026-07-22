@@ -6,9 +6,9 @@ TRIAGE_SYSTEM_PROMPT = """You are an expert disaster response triage AI. Extract
 Analyze the message step by step, then extract the required fields.
 
 ### 1. Intent Classification
-- **REQUEST**: Sender is actively asking for help, rescue, supplies, or assistance.
+- **REQUEST**: Sender is asking for help, rescue, supplies, or assistance. An active life-threatening situation (flooding, fire, building collapse, trapped people, severe injury, etc.) is an implicit REQUEST even without "help" or "please" language.
 - **OFFER**: Sender is offering to provide help, resources, or volunteer.
-- **OTHER**: Purely informational updates, news reports, or casual conversation.
+- **OTHER**: Purely informational updates, news reports, or casual conversation. Do NOT use OTHER for messages describing an active disaster or life-threatening situation.
 
 ### 2. Severity Levels (used for both hazards and resources)
 - **1 (MILD)**: Mentioned but no immediate urgency
@@ -79,7 +79,7 @@ VERIFY_SYSTEM_PROMPT = """You are a quality assurance checker for disaster triag
 Valid intent values are ONLY: REQUEST, OFFER, OTHER.
 
 ## What to check
-1. **Wrong intent** — message asks for help but classified as OTHER, or clearly informational but classified as REQUEST.
+1. **Wrong intent** — message asks for help but classified as OTHER. Do NOT flag REQUEST just because the message sounds factual. In a disaster context, reporting an active life-threatening situation (flooding, fire, building collapse, severe injury, etc.) is an implicit REQUEST.
 2. **Missing hazard** — a hazard from the allowed list is EXPLICITLY NAMED in the message but not extracted. Do NOT flag implied hazards.
 3. **Missing resource** — a resource from the allowed list is EXPLICITLY NAMED in the message but not extracted. Do NOT flag implied resources.
 4. **Wrong severity** — only flag if language DIRECTLY CONTRADICTS the level (e.g., "people are dying" mapped to severity 1, or "minor issue" mapped to severity 4). Do NOT suggest severity upgrades for food/water/medical needs — severity 3 (SEVERE) is a valid and common assignment for urgent needs. Accept 2, 3, or 4 as reasonable unless plainly contradictory.

@@ -10,12 +10,12 @@ appear in the golden's output). This separates precision from recall.
 import json
 import logging
 import sys
-from pathlib import Path
 from collections import Counter
+from pathlib import Path
 
+from rakshak_edge.config import settings
 from rakshak_edge.graph import graph
 from rakshak_edge.state import TriageState
-from rakshak_edge.config import settings
 from rakshak_edge.utils.logger import setup_logger
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -63,7 +63,9 @@ def compare(golden_path: Path):
 
     pipeline_model = settings["llm"]["model_name"]
     logger.info("Comparing %s samples from %s", len(samples), golden_path.name)
-    logger.info("Pipeline model: %s | Golden model: %s", pipeline_model, golden["model"])
+    logger.info(
+        "Pipeline model: %s | Golden model: %s", pipeline_model, golden["model"]
+    )
 
     # Exact match
     e_intent = e_hazard = e_resource = 0
@@ -97,10 +99,12 @@ def compare(golden_path: Path):
         if pipe["intent"] == "ERROR":
             logger.warning("  Skipping message %d — pipeline error: %s", i, text[:60])
             status = "ERR"
-            print(f"[{i}/{len(samples)}] {status} r={pipe['retry_count']} | {text[:60]}")
+            print(
+                f"[{i}/{len(samples)}] {status} r={pipe['retry_count']} | {text[:60]}"
+            )
             continue
 
-        # --- Intent ---
+        # ─── Intent ───
         i_exact = pipe["intent"] == ref["intent"]
         if i_exact:
             e_intent += 1
@@ -113,7 +117,7 @@ def compare(golden_path: Path):
                 "retries": pipe["retry_count"],
             })
 
-        # --- Hazards ---
+        # ─── Hazards ───
         h_exact = pipe["hazards"] == ref_h
         h_subset = pipe["hazards"] <= ref_h
         if h_exact:
@@ -139,7 +143,7 @@ def compare(golden_path: Path):
             if h not in pipe["hazards"]:
                 hazard_fn[h] += 1
 
-        # --- Resources ---
+        # ─── Resources ───
         r_exact = pipe["resources"] == ref_r
         r_subset = pipe["resources"] <= ref_r
         if r_exact:
@@ -177,16 +181,28 @@ def compare(golden_path: Path):
 
     print()
     print(f"=== RESULTS ({total} messages) ===")
-    print(f"              Exact    Subset")
-    print(f"Intent:      {e_intent:>2}/{total} ({100*e_intent//total:>2}%)    {s_intent:>2}/{total} ({100*s_intent//total:>2}%)")
-    print(f"Hazards:     {e_hazard:>2}/{total} ({100*e_hazard//total:>2}%)    {s_hazard:>2}/{total} ({100*s_hazard//total:>2}%)")
-    print(f"Resources:   {e_resource:>2}/{total} ({100*e_resource//total:>2}%)    {s_resource:>2}/{total} ({100*s_resource//total:>2}%)")
-    print(f"Avg retries: {avg_retries:.1f} | With retries: {msgs_with_retries} | Exhausted: {msgs_exhausted}")
+    print("              Exact    Subset")
+    print(
+        f"Intent:      {e_intent:>2}/{total} ({100 * e_intent // total:>2}%)    {s_intent:>2}/{total} ({100 * s_intent // total:>2}%)"
+    )
+    print(
+        f"Hazards:     {e_hazard:>2}/{total} ({100 * e_hazard // total:>2}%)    {s_hazard:>2}/{total} ({100 * s_hazard // total:>2}%)"
+    )
+    print(
+        f"Resources:   {e_resource:>2}/{total} ({100 * e_resource // total:>2}%)    {s_resource:>2}/{total} ({100 * s_resource // total:>2}%)"
+    )
+    print(
+        f"Avg retries: {avg_retries:.1f} | With retries: {msgs_with_retries} | Exhausted: {msgs_exhausted}"
+    )
 
     # Per-category precision/recall
     if hazard_tp or hazard_fp or hazard_fn:
-        print(f"\n--- Hazard per-category ---")
-        all_h_types = sorted(set(list(hazard_tp.keys()) + list(hazard_fp.keys()) + list(hazard_fn.keys())))
+        print("\n--- Hazard per-category ---")
+        all_h_types = sorted(
+            set(
+                list(hazard_tp.keys()) + list(hazard_fp.keys()) + list(hazard_fn.keys())
+            )
+        )
         print(f"  {'Type':25s} {'TP':>3} {'FP':>3} {'FN':>3} {'Prec':>5} {'Rec':>5}")
         for ht in all_h_types:
             tp = hazard_tp.get(ht, 0)
@@ -197,8 +213,14 @@ def compare(golden_path: Path):
             print(f"  {ht:25s} {tp:>3} {fp:>3} {fn:>3} {prec:>4.0f}% {rec:>4.0f}%")
 
     if resource_tp or resource_fp or resource_fn:
-        print(f"\n--- Resource per-category ---")
-        all_r_types = sorted(set(list(resource_tp.keys()) + list(resource_fp.keys()) + list(resource_fn.keys())))
+        print("\n--- Resource per-category ---")
+        all_r_types = sorted(
+            set(
+                list(resource_tp.keys())
+                + list(resource_fp.keys())
+                + list(resource_fn.keys())
+            )
+        )
         print(f"  {'Type':25s} {'TP':>3} {'FP':>3} {'FN':>3} {'Prec':>5} {'Rec':>5}")
         for rt in all_r_types:
             tp = resource_tp.get(rt, 0)
@@ -211,19 +233,25 @@ def compare(golden_path: Path):
     if intent_diffs:
         print(f"\n--- Intent disagreements ({len(intent_diffs)}) ---")
         for d in intent_diffs:
-            print(f"  pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}")
+            print(
+                f"  pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}"
+            )
 
     if hazard_diffs:
         print(f"\n--- Hazard disagreements ({len(hazard_diffs)}) ---")
         for d in hazard_diffs:
             subset_label = "subset✓" if d["subset"] else "subset✗"
-            print(f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}")
+            print(
+                f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}"
+            )
 
     if resource_diffs:
         print(f"\n--- Resource disagreements ({len(resource_diffs)}) ---")
         for d in resource_diffs[:8]:
             subset_label = "subset✓" if d["subset"] else "subset✗"
-            print(f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}")
+            print(
+                f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}"
+            )
         if len(resource_diffs) > 8:
             print(f"  ... and {len(resource_diffs) - 8} more")
 
@@ -252,20 +280,60 @@ def compare(golden_path: Path):
                 "tp": hazard_tp.get(k, 0),
                 "fp": hazard_fp.get(k, 0),
                 "fn": hazard_fn.get(k, 0),
-                "precision": round(hazard_tp.get(k, 0) / (hazard_tp.get(k, 0) + hazard_fp.get(k, 0)) * 100, 1) if (hazard_tp.get(k, 0) + hazard_fp.get(k, 0)) > 0 else 0,
-                "recall": round(hazard_tp.get(k, 0) / (hazard_tp.get(k, 0) + hazard_fn.get(k, 0)) * 100, 1) if (hazard_tp.get(k, 0) + hazard_fn.get(k, 0)) > 0 else 0,
+                "precision": round(
+                    hazard_tp.get(k, 0)
+                    / (hazard_tp.get(k, 0) + hazard_fp.get(k, 0))
+                    * 100,
+                    1,
+                )
+                if (hazard_tp.get(k, 0) + hazard_fp.get(k, 0)) > 0
+                else 0,
+                "recall": round(
+                    hazard_tp.get(k, 0)
+                    / (hazard_tp.get(k, 0) + hazard_fn.get(k, 0))
+                    * 100,
+                    1,
+                )
+                if (hazard_tp.get(k, 0) + hazard_fn.get(k, 0)) > 0
+                else 0,
             }
-            for k in sorted(set(list(hazard_tp.keys()) + list(hazard_fp.keys()) + list(hazard_fn.keys())))
+            for k in sorted(
+                set(
+                    list(hazard_tp.keys())
+                    + list(hazard_fp.keys())
+                    + list(hazard_fn.keys())
+                )
+            )
         },
         "resource_category": {
             k: {
                 "tp": resource_tp.get(k, 0),
                 "fp": resource_fp.get(k, 0),
                 "fn": resource_fn.get(k, 0),
-                "precision": round(resource_tp.get(k, 0) / (resource_tp.get(k, 0) + resource_fp.get(k, 0)) * 100, 1) if (resource_tp.get(k, 0) + resource_fp.get(k, 0)) > 0 else 0,
-                "recall": round(resource_tp.get(k, 0) / (resource_tp.get(k, 0) + resource_fn.get(k, 0)) * 100, 1) if (resource_tp.get(k, 0) + resource_fn.get(k, 0)) > 0 else 0,
+                "precision": round(
+                    resource_tp.get(k, 0)
+                    / (resource_tp.get(k, 0) + resource_fp.get(k, 0))
+                    * 100,
+                    1,
+                )
+                if (resource_tp.get(k, 0) + resource_fp.get(k, 0)) > 0
+                else 0,
+                "recall": round(
+                    resource_tp.get(k, 0)
+                    / (resource_tp.get(k, 0) + resource_fn.get(k, 0))
+                    * 100,
+                    1,
+                )
+                if (resource_tp.get(k, 0) + resource_fn.get(k, 0)) > 0
+                else 0,
             }
-            for k in sorted(set(list(resource_tp.keys()) + list(resource_fp.keys()) + list(resource_fn.keys())))
+            for k in sorted(
+                set(
+                    list(resource_tp.keys())
+                    + list(resource_fp.keys())
+                    + list(resource_fn.keys())
+                )
+            )
         },
         "avg_retries": round(avg_retries, 2),
         "messages_with_retries": msgs_with_retries,
