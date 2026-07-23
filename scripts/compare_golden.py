@@ -5,8 +5,11 @@ against golden reference labels.
 Uses subset matching: pipeline's predictions should be a subset of the golden's
 (golden is the more capable model, so pipeline's correct predictions should
 appear in the golden's output). This separates precision from recall.
+
+Processes samples concurrently via asyncio.Semaphore for speed.
 """
 
+import asyncio
 import json
 import logging
 import sys
@@ -24,16 +27,18 @@ DATA_DIR = ROOT_DIR / "data"
 setup_logger()
 logger = logging.getLogger(__name__)
 
+_CONCURRENCY = 4
+
 
 def load_golden(path: Path) -> dict:
     with open(path) as f:
         return json.load(f)
 
 
-def triage_message(message: str) -> dict:
+async def triage_message(message: str) -> dict:
     initial: TriageState = {"message": message, "retry_count": 0}
     try:
-        result = graph.invoke(initial)
+        result = await graph.ainvoke(initial)
         out = result["output"]
         return {
             "intent": out.intent,
@@ -57,19 +62,45 @@ def triage_message(message: str) -> dict:
         }
 
 
-def compare(golden_path: Path):
+async def _compare_one(sample: dict, sem: asyncio.Semaphore, idx: int, total: int) -> dict:
+    """Run pipeline on one sample, return comparison result dict."""
+    text = sample["input_text"]
+    ref = sample["reference"]
+
+    async with sem:
+        pipe = await triage_message(text)
+
+    ref_h = {h["type"] for h in ref.get("hazards", [])}
+    ref_r = {r["type"] for r in ref.get("resources", [])}
+
+    result = {
+        "idx": idx,
+        "text": text,
+        "pipe": pipe,
+        "ref": ref,
+        "ref_h": ref_h,
+        "ref_r": ref_r,
+    }
+    return result
+
+
+async def compare(golden_path: Path):
     golden = load_golden(golden_path)
     samples = golden["samples"]
 
     pipeline_model = settings["llm"]["model_name"]
     logger.info("Comparing %s samples from %s", len(samples), golden_path.name)
     logger.info(
-        "Pipeline model: %s | Golden model: %s", pipeline_model, golden["model"]
+        "Pipeline model: %s | Golden model: %s (concurrency=%s)",
+        pipeline_model, golden["model"], _CONCURRENCY,
     )
 
-    # Exact match
+    sem = asyncio.Semaphore(_CONCURRENCY)
+    tasks = [_compare_one(s, sem, i, len(samples)) for i, s in enumerate(samples, 1)]
+    results = await asyncio.gather(*tasks)
+
+    # --- Aggregate ---
     e_intent = e_hazard = e_resource = 0
-    # Subset match: pipeline ⊆ golden (no false positives)
     s_intent = s_hazard = s_resource = 0
 
     intent_diffs = []
@@ -77,35 +108,29 @@ def compare(golden_path: Path):
     resource_diffs = []
     retry_counts = []
 
-    # Per-category counters
-    hazard_tp = Counter()  # true positives
-    hazard_fp = Counter()  # pipeline predicted but golden didn't
-    hazard_fn = Counter()  # golden predicted but pipeline didn't
-    resource_tp = Counter()
-    resource_fp = Counter()
-    resource_fn = Counter()
+    hazard_tp: Counter[str] = Counter()
+    hazard_fp: Counter[str] = Counter()
+    hazard_fn: Counter[str] = Counter()
+    resource_tp: Counter[str] = Counter()
+    resource_fp: Counter[str] = Counter()
+    resource_fn: Counter[str] = Counter()
 
-    for i, sample in enumerate(samples, 1):
-        text = sample["input_text"]
-        ref = sample["reference"]
+    for r in sorted(results, key=lambda x: x["idx"]):
+        pipe = r["pipe"]
+        text = r["text"]
+        ref_h = r["ref_h"]
+        ref_r = r["ref_r"]
+        idx = r["idx"]
 
-        ref_h = {h["type"] for h in ref.get("hazards", [])}
-        ref_r = {r["type"] for r in ref.get("resources", [])}
-
-        pipe = triage_message(text)
         retry_counts.append(pipe["retry_count"])
 
-        # Skip counting on pipeline errors
         if pipe["intent"] == "ERROR":
-            logger.warning("  Skipping message %d — pipeline error: %s", i, text[:60])
-            status = "ERR"
-            print(
-                f"[{i}/{len(samples)}] {status} r={pipe['retry_count']} | {text[:60]}"
-            )
+            logger.warning("  Skipping message %d — pipeline error: %s", idx, text[:60])
+            print(f"[{idx}/{len(samples)}] ERR r={pipe['retry_count']} | {text[:60]}")
             continue
 
-        # ─── Intent ───
-        i_exact = pipe["intent"] == ref["intent"]
+        # Intent
+        i_exact = pipe["intent"] == r["ref"]["intent"]
         if i_exact:
             e_intent += 1
             s_intent += 1
@@ -113,11 +138,11 @@ def compare(golden_path: Path):
             intent_diffs.append({
                 "text": text[:80],
                 "pipeline": pipe["intent"],
-                "ref": ref["intent"],
+                "ref": r["ref"]["intent"],
                 "retries": pipe["retry_count"],
             })
 
-        # ─── Hazards ───
+        # Hazards
         h_exact = pipe["hazards"] == ref_h
         h_subset = pipe["hazards"] <= ref_h
         if h_exact:
@@ -133,7 +158,6 @@ def compare(golden_path: Path):
                 "retries": pipe["retry_count"],
             })
 
-        # Per-category hazard
         for h in pipe["hazards"]:
             if h in ref_h:
                 hazard_tp[h] += 1
@@ -143,7 +167,7 @@ def compare(golden_path: Path):
             if h not in pipe["hazards"]:
                 hazard_fn[h] += 1
 
-        # ─── Resources ───
+        # Resources
         r_exact = pipe["resources"] == ref_r
         r_subset = pipe["resources"] <= ref_r
         if r_exact:
@@ -159,20 +183,19 @@ def compare(golden_path: Path):
                 "retries": pipe["retry_count"],
             })
 
-        # Per-category resource
-        for r in pipe["resources"]:
-            if r in ref_r:
-                resource_tp[r] += 1
+        for r_cat in pipe["resources"]:
+            if r_cat in ref_r:
+                resource_tp[r_cat] += 1
             else:
-                resource_fp[r] += 1
-        for r in ref_r:
-            if r not in pipe["resources"]:
-                resource_fn[r] += 1
+                resource_fp[r_cat] += 1
+        for r_cat in ref_r:
+            if r_cat not in pipe["resources"]:
+                resource_fn[r_cat] += 1
 
         status = f"{'✓' if i_exact else '✗'}i "
         status += f"{'✓' if h_exact else ('~' if h_subset else '✗')}h "
         status += f"{'✓' if r_exact else ('~' if r_subset else '✗')}r"
-        print(f"[{i}/{len(samples)}] {status} r={pipe['retry_count']} | {text[:60]}")
+        print(f"[{idx}/{len(samples)}] {status} r={pipe['retry_count']} | {text[:60]}")
 
     total = len(samples)
     avg_retries = sum(retry_counts) / len(retry_counts) if retry_counts else 0
@@ -198,11 +221,7 @@ def compare(golden_path: Path):
     # Per-category precision/recall
     if hazard_tp or hazard_fp or hazard_fn:
         print("\n--- Hazard per-category ---")
-        all_h_types = sorted(
-            set(
-                list(hazard_tp.keys()) + list(hazard_fp.keys()) + list(hazard_fn.keys())
-            )
-        )
+        all_h_types = sorted(set(list(hazard_tp) + list(hazard_fp) + list(hazard_fn)))
         print(f"  {'Type':25s} {'TP':>3} {'FP':>3} {'FN':>3} {'Prec':>5} {'Rec':>5}")
         for ht in all_h_types:
             tp = hazard_tp.get(ht, 0)
@@ -214,13 +233,7 @@ def compare(golden_path: Path):
 
     if resource_tp or resource_fp or resource_fn:
         print("\n--- Resource per-category ---")
-        all_r_types = sorted(
-            set(
-                list(resource_tp.keys())
-                + list(resource_fp.keys())
-                + list(resource_fn.keys())
-            )
-        )
+        all_r_types = sorted(set(list(resource_tp) + list(resource_fp) + list(resource_fn)))
         print(f"  {'Type':25s} {'TP':>3} {'FP':>3} {'FN':>3} {'Prec':>5} {'Rec':>5}")
         for rt in all_r_types:
             tp = resource_tp.get(rt, 0)
@@ -233,107 +246,62 @@ def compare(golden_path: Path):
     if intent_diffs:
         print(f"\n--- Intent disagreements ({len(intent_diffs)}) ---")
         for d in intent_diffs:
-            print(
-                f"  pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}"
-            )
+            print(f"  pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}")
 
     if hazard_diffs:
         print(f"\n--- Hazard disagreements ({len(hazard_diffs)}) ---")
         for d in hazard_diffs:
             subset_label = "subset✓" if d["subset"] else "subset✗"
-            print(
-                f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}"
-            )
+            print(f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}")
 
     if resource_diffs:
         print(f"\n--- Resource disagreements ({len(resource_diffs)}) ---")
         for d in resource_diffs[:8]:
             subset_label = "subset✓" if d["subset"] else "subset✗"
-            print(
-                f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}"
-            )
+            print(f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}")
         if len(resource_diffs) > 8:
             print(f"  ... and {len(resource_diffs) - 8} more")
+
+    def pct(num: int) -> float:
+        return round(100 * num / total, 1)
 
     report = {
         "pipeline_model": settings["llm"]["model_name"],
         "golden_model": golden.get("model", "unknown"),
         "total": total,
         "exact_match": {
-            "intent": e_intent,
-            "intent_pct": round(100 * e_intent / total, 1),
-            "hazard": e_hazard,
-            "hazard_pct": round(100 * e_hazard / total, 1),
-            "resource": e_resource,
-            "resource_pct": round(100 * e_resource / total, 1),
+            "intent": e_intent, "intent_pct": pct(e_intent),
+            "hazard": e_hazard, "hazard_pct": pct(e_hazard),
+            "resource": e_resource, "resource_pct": pct(e_resource),
         },
         "subset_match": {
-            "intent": s_intent,
-            "intent_pct": round(100 * s_intent / total, 1),
-            "hazard": s_hazard,
-            "hazard_pct": round(100 * s_hazard / total, 1),
-            "resource": s_resource,
-            "resource_pct": round(100 * s_resource / total, 1),
+            "intent": s_intent, "intent_pct": pct(s_intent),
+            "hazard": s_hazard, "hazard_pct": pct(s_hazard),
+            "resource": s_resource, "resource_pct": pct(s_resource),
         },
         "hazard_category": {
             k: {
                 "tp": hazard_tp.get(k, 0),
                 "fp": hazard_fp.get(k, 0),
                 "fn": hazard_fn.get(k, 0),
-                "precision": round(
-                    hazard_tp.get(k, 0)
-                    / (hazard_tp.get(k, 0) + hazard_fp.get(k, 0))
-                    * 100,
-                    1,
-                )
-                if (hazard_tp.get(k, 0) + hazard_fp.get(k, 0)) > 0
-                else 0,
-                "recall": round(
-                    hazard_tp.get(k, 0)
-                    / (hazard_tp.get(k, 0) + hazard_fn.get(k, 0))
-                    * 100,
-                    1,
-                )
-                if (hazard_tp.get(k, 0) + hazard_fn.get(k, 0)) > 0
-                else 0,
+                "precision": round(hazard_tp.get(k, 0) / (hazard_tp.get(k, 0) + hazard_fp.get(k, 0)) * 100, 1)
+                if (hazard_tp.get(k, 0) + hazard_fp.get(k, 0)) > 0 else 0,
+                "recall": round(hazard_tp.get(k, 0) / (hazard_tp.get(k, 0) + hazard_fn.get(k, 0)) * 100, 1)
+                if (hazard_tp.get(k, 0) + hazard_fn.get(k, 0)) > 0 else 0,
             }
-            for k in sorted(
-                set(
-                    list(hazard_tp.keys())
-                    + list(hazard_fp.keys())
-                    + list(hazard_fn.keys())
-                )
-            )
+            for k in sorted(set(list(hazard_tp) + list(hazard_fp) + list(hazard_fn)))
         },
         "resource_category": {
             k: {
                 "tp": resource_tp.get(k, 0),
                 "fp": resource_fp.get(k, 0),
                 "fn": resource_fn.get(k, 0),
-                "precision": round(
-                    resource_tp.get(k, 0)
-                    / (resource_tp.get(k, 0) + resource_fp.get(k, 0))
-                    * 100,
-                    1,
-                )
-                if (resource_tp.get(k, 0) + resource_fp.get(k, 0)) > 0
-                else 0,
-                "recall": round(
-                    resource_tp.get(k, 0)
-                    / (resource_tp.get(k, 0) + resource_fn.get(k, 0))
-                    * 100,
-                    1,
-                )
-                if (resource_tp.get(k, 0) + resource_fn.get(k, 0)) > 0
-                else 0,
+                "precision": round(resource_tp.get(k, 0) / (resource_tp.get(k, 0) + resource_fp.get(k, 0)) * 100, 1)
+                if (resource_tp.get(k, 0) + resource_fp.get(k, 0)) > 0 else 0,
+                "recall": round(resource_tp.get(k, 0) / (resource_tp.get(k, 0) + resource_fn.get(k, 0)) * 100, 1)
+                if (resource_tp.get(k, 0) + resource_fn.get(k, 0)) > 0 else 0,
             }
-            for k in sorted(
-                set(
-                    list(resource_tp.keys())
-                    + list(resource_fp.keys())
-                    + list(resource_fn.keys())
-                )
-            )
+            for k in sorted(set(list(resource_tp) + list(resource_fp) + list(resource_fn)))
         },
         "avg_retries": round(avg_retries, 2),
         "messages_with_retries": msgs_with_retries,
@@ -351,4 +319,4 @@ def compare(golden_path: Path):
 
 if __name__ == "__main__":
     path = sys.argv[1] if len(sys.argv) > 1 else "data/golden/golden_validation_50.json"
-    compare(Path(path))
+    asyncio.run(compare(Path(path)))

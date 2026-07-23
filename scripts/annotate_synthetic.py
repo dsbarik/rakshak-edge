@@ -1,14 +1,17 @@
 """
-Annotate synthetic disaster SMS messages using minimax-m3:cloud.
+Annotate synthetic disaster SMS messages using a cloud LLM.
 
 Loads synthetic_messages_*.json, sends each through the cloud annotation
 pipeline (same prompt as the triage pipeline), and saves the result as a
 golden dataset for comparison.
 
+Processes samples concurrently via asyncio.Semaphore for speed.
+
 Usage:
-    uv run python scripts/annotate_synthetic.py [--limit N] [--model minimax-m3:cloud]
+    uv run python scripts/annotate_synthetic.py [--limit N] [--model minimax-m3:cloud] [--concurrency 4]
 """
 
+import asyncio
 import json
 import logging
 import time
@@ -24,6 +27,8 @@ logger = logging.getLogger(__name__)
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 GOLDEN_DIR = ROOT_DIR / "data" / "golden"
+
+DEFAULT_CONCURRENCY = 4
 
 # ── Annotation prompt (mirrors prompts.py → keep in sync) ─────────────
 
@@ -110,6 +115,7 @@ ANNOTATION_CHAIN = ChatPromptTemplate.from_messages([
 
 # ── File services ────────────────────────────────────────────────────
 
+
 def find_latest_synthetic(directory: Path = GOLDEN_DIR) -> Path:
     """Find the latest synthetic_messages_*.json in the golden dir."""
     candidates = sorted(directory.glob("synthetic_messages_*.json"))
@@ -129,6 +135,7 @@ def load_samples(path: Path) -> list[dict]:
 
 # ── Annotation functions ─────────────────────────────────────────────
 
+
 def parse_annotation(raw: str) -> dict:
     """Parse the model's raw response into a structured annotation dict."""
     try:
@@ -139,43 +146,48 @@ def parse_annotation(raw: str) -> dict:
     return parsed
 
 
-def annotate_one(llm: ChatOllama, message: str) -> dict:
+async def annotate_one(llm: ChatOllama, message: str, sem: asyncio.Semaphore) -> dict:
     """Annotate a single message. Returns the structured annotation dict."""
-    chain = ANNOTATION_CHAIN | llm
-    response = chain.invoke({"message": message})
+    async with sem:
+        chain = ANNOTATION_CHAIN | llm
+        response = await chain.ainvoke({"message": message})
     return parse_annotation(response.content)
 
 
-def annotate_batch(
+async def annotate_batch(
     llm: ChatOllama,
     samples: list[dict],
-    delay: float = 0.5,
+    concurrency: int = DEFAULT_CONCURRENCY,
 ) -> tuple[list[dict], list[dict]]:
-    """Annotate a batch of messages. Returns (results, errors)."""
-    results: list[dict] = []
+    """Annotate a batch of messages concurrently. Returns (results, errors)."""
+    sem = asyncio.Semaphore(concurrency)
+    gathered: list[tuple[int, dict | None]] = [None] * len(samples)
     errors: list[dict] = []
     start = time.time()
 
-    for i, sample in enumerate(samples, 1):
+    async def annotate_one_with_index(sample: dict, idx: int) -> None:
         text = sample["input_text"]
         hints = sample.get("reference_hints", {})
-
         try:
-            logger.info("[%d/%d] %s", i, len(samples), text[:80])
-            annotation = annotate_one(llm, text)
+            logger.info("[%d/%d] %s", idx, len(samples), text[:80])
+            annotation = await annotate_one(llm, text, sem)
+            gathered[idx - 1] = (idx, {
+                "input_text": text,
+                "reference": annotation,
+                "reference_hints": hints,
+            })
         except Exception as e:
-            logger.error("[%d/%d] Failed: %s", i, len(samples), e)
-            errors.append({"index": i - 1, "message": text, "error": str(e)})
-            continue
+            logger.error("[%d/%d] Failed: %s", idx, len(samples), e)
+            gathered[idx - 1] = None
+            errors.append({"index": idx - 1, "message": text, "error": str(e)})
 
-        results.append({
-            "input_text": text,
-            "reference": annotation,
-            "reference_hints": hints,
-        })
+    tasks = [annotate_one_with_index(s, i) for i, s in enumerate(samples, 1)]
+    await asyncio.gather(*tasks)
 
-        if i < len(samples):
-            time.sleep(delay)
+    # Reconstruct in input order
+    results = [entry for entry in gathered if entry is not None]
+    results.sort(key=lambda x: x[0])
+    results = [r for _, r in results]
 
     elapsed = time.time() - start
     logger.info("Finished: %d annotated, %d errors in %.1fs", len(results), len(errors), elapsed)
@@ -183,6 +195,7 @@ def annotate_batch(
 
 
 # ── Golden dataset formatting & IO ───────────────────────────────────
+
 
 def to_golden_json(results: list[dict], errors: list[dict], model: str = "minimax-m3:cloud") -> dict:
     """Convert annotation results into golden dataset format (pure)."""
@@ -208,6 +221,7 @@ def save_golden(data: dict, directory: Path = GOLDEN_DIR) -> Path:
 
 # ── LLM factory (delegates to project's shared get_llm) ─────────────
 
+
 def create_llm(model: str, temperature: float = 0.0) -> ChatOllama:
     """Create a ChatOllama instance. Delegates to the project's shared get_llm()."""
     from rakshak_edge.llm import get_llm
@@ -216,13 +230,14 @@ def create_llm(model: str, temperature: float = 0.0) -> ChatOllama:
 
 # ── Entry point ─────────────────────────────────────────────────────
 
-def main():
+
+async def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description="Annotate synthetic messages")
+    parser = argparse.ArgumentParser(description="Annotate synthetic messages concurrently")
     parser.add_argument("--limit", type=int, help="Number of messages to annotate (default: all)")
     parser.add_argument("--model", default="minimax-m3:cloud", help="Ollama model (default: minimax-m3:cloud)")
-    parser.add_argument("--delay", type=float, default=0.5, help="Delay between requests in seconds")
+    parser.add_argument("--concurrency", type=int, default=DEFAULT_CONCURRENCY, help="Concurrent API calls (default: 4)")
     args = parser.parse_args()
 
     llm = create_llm(args.model)
@@ -233,14 +248,14 @@ def main():
         samples = samples[:args.limit]
 
     print(f"Starting annotation of {len(samples)} messages with {args.model}...")
-    print("This will take ~30-60 seconds per message.")
+    print(f"Concurrency: {args.concurrency} — this will be ~{args.concurrency}x faster than sequential.")
     print("Make sure you are signed in: ollama signin")
 
-    results, errors = annotate_batch(llm, samples, delay=args.delay)
+    results, errors = await annotate_batch(llm, samples, concurrency=args.concurrency)
     golden = to_golden_json(results, errors, model=args.model)
     path = save_golden(golden)
     print(f"Done: {len(results)} annotated, {len(errors)} errors → {path}")
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

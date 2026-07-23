@@ -1,0 +1,1678 @@
+{
+  "model": "minimax-m3:cloud",
+  "split": "synthetic_validation",
+  "count": 53,
+  "errors": 0,
+  "source": "Synthetic messages from scripts/generate_synthetic.py",
+  "samples": [
+    {
+      "input_text": "Paani ghar mein ghus gaya hai. Hum log roof par chadh gaye hain. Please jaldi bhejo koi.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FLOODS",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "FLOODS"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE",
+          "TRANSPORT"
+        ]
+      }
+    },
+    {
+      "input_text": "Bandh toot gaya. Saara gaon doob gaya. Do din se kuch nahi khaya hai. Bache ro rahe hain.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FLOODS",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "FOOD",
+            "severity": 4
+          },
+          {
+            "type": "SHELTER",
+            "severity": 4
+          },
+          {
+            "type": "WATER",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "FLOODS"
+        ],
+        "resources": [
+          "FOOD",
+          "WATER",
+          "TRANSPORT"
+        ]
+      }
+    },
+    {
+      "input_text": "Water coming from all sides. Five families stuck on first floor with small children. No way out please come fast.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FLOODS",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "FLOODS"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE",
+          "TRANSPORT",
+          "SHELTER"
+        ]
+      }
+    },
+    {
+      "input_text": "Nadi ka paani har ghante badh raha hai. Humara ghar bahut neeche hai. Koi naav hai? Bache bahut dar rahe hain.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FLOODS",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "TRANSPORT",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "FLOODS"
+        ],
+        "resources": [
+          "TRANSPORT",
+          "SEARCH_AND_RESCUE"
+        ]
+      }
+    },
+    {
+      "input_text": "Paani ke saath saanp aur bijju ghar mein ghus gaye hain. Teen log ko kaat liya. Bahut dar lag raha hai yahan.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FLOODS",
+            "severity": 2
+          }
+        ],
+        "resources": [
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "FLOODS"
+        ],
+        "resources": [
+          "MEDICAL_HELP",
+          "SEARCH_AND_RESCUE"
+        ]
+      }
+    },
+    {
+      "input_text": "Hawa itni tez hai ki ghar ka chhat udd gaya. Baarish andar aa rahi hai. Teen bache hain. Koi safe jagah hai?",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "STORM",
+            "severity": 3
+          },
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "SHELTER",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "STORM",
+          "STRUCTURAL_DAMAGE"
+        ],
+        "resources": [
+          "SHELTER",
+          "CLOTHING"
+        ]
+      }
+    },
+    {
+      "input_text": "Cyclone ne saare khet barbaad kar diye. Is saal kuch nahi bachega. Chaar bachhon ka pet kaise palenge.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "STORM",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "FOOD",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "STORM"
+        ],
+        "resources": [
+          "FOOD",
+          "WATER"
+        ]
+      }
+    },
+    {
+      "input_text": "Peda! Peda gir rahe hain! Teen ped hamare ghar ke upar gir gaye. Maa andar phasee hai. Koi hatane mein madad karo.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "STORM",
+          "STRUCTURAL_DAMAGE"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE",
+          "MEDICAL_HELP",
+          "TRANSPORT"
+        ]
+      }
+    },
+    {
+      "input_text": "Yahan to sab uchal raha hai. School ka building bhi gir gaya. Bache uske neeche dab gaye honge. Please jaldi aao.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "EARTHQUAKE",
+            "severity": 4
+          },
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          },
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "STORM",
+          "STRUCTURAL_DAMAGE"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE",
+          "MEDICAL_HELP"
+        ]
+      }
+    },
+    {
+      "input_text": "Samandar ka paani andar aa gaya hai. Pura gaon doob gaya. Bohot log beach mein phase hain. Helicopter chahiye.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FLOODS",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          },
+          {
+            "type": "TRANSPORT",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "STORM",
+          "FLOODS"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE",
+          "TRANSPORT",
+          "FOOD",
+          "WATER"
+        ]
+      }
+    },
+    {
+      "input_text": "Jungle mein aag lag gayi. Hawa ki taraf se gaon ki taraf badh rahi hai. Sab log bhagne lage hain. Koi bachao.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FIRE",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          },
+          {
+            "type": "SHELTER",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "FIRE"
+        ],
+        "resources": [
+          "TRANSPORT",
+          "SHELTER",
+          "SEARCH_AND_RESCUE"
+        ]
+      }
+    },
+    {
+      "input_text": "Bada dhamaka hua. Cylinder phat gaya. Pados ke ghar mein aag lag gayi aur ek bachcha andar hai. Fire brigade bulao.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FIRE",
+            "severity": 4
+          },
+          {
+            "type": "GAS_LEAK",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          },
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "FIRE",
+          "GAS_LEAK"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE",
+          "MEDICAL_HELP"
+        ]
+      }
+    },
+    {
+      "input_text": "Smoke coming from ground floor. People running with whatever they could grab. Old man cannot walk. Need help.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FIRE",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 3
+          },
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          },
+          {
+            "type": "TRANSPORT",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "FIRE"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE",
+          "MEDICAL_HELP",
+          "TRANSPORT"
+        ]
+      }
+    },
+    {
+      "input_text": "Bijli ki wiring mein short circuit hua. Building ke neeche se dhuaan aa raha hai. Log andar phase hain koi kaat ke andar nahi ja sakta.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FIRE",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          },
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "FIRE",
+          "POWER_OUTAGE"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE"
+        ]
+      }
+    },
+    {
+      "input_text": "Gaon ke paas jungle jal raha hai. Hawa ulti taraf hai toh hum safe hain par jaanwar jal rahe hain. Pani aur medical help bhejo.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FIRE",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "WATER",
+            "severity": 3
+          },
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "FIRE"
+        ],
+        "resources": [
+          "WATER",
+          "MEDICAL_HELP"
+        ]
+      }
+    },
+    {
+      "input_text": "Itni thand hai ki pani jam gaya hai. Bache aur budhe bimari se mare ja rahe hain. Kambal aur dawai chahiye.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "COLD",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "CLOTHING",
+            "severity": 4
+          },
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "COLD"
+        ],
+        "resources": [
+          "CLOTHING",
+          "HEATING",
+          "MEDICAL_HELP"
+        ]
+      }
+    },
+    {
+      "input_text": "Himachal mein temperature minus 5 hai raat ko. Humare paas kambal nahi hai. Bache raat bhar rote hain. Jaldi kuch bhejo.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "COLD",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "CLOTHING",
+            "severity": 4
+          },
+          {
+            "type": "HEATING",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "COLD"
+        ],
+        "resources": [
+          "CLOTHING",
+          "HEATING",
+          "SHELTER"
+        ]
+      }
+    },
+    {
+      "input_text": "Kohra itna ghana hai ki kuch dikhta nahi. Do log sadak par gir gaye aur mar gaye. Ambulance chahiye but road band hai.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "STORM",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 4
+          },
+          {
+            "type": "TRANSPORT",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "COLD"
+        ],
+        "resources": [
+          "MEDICAL_HELP",
+          "TRANSPORT"
+        ]
+      }
+    },
+    {
+      "input_text": "Cold wave ki wajah se saari faslein khatam ho gayi. Ghar mein kuch nahi bacha. Bache bhukh se ro rahe hain. Rasan aur kapde bhejo.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "COLD",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "FOOD",
+            "severity": 4
+          },
+          {
+            "type": "CLOTHING",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "COLD"
+        ],
+        "resources": [
+          "FOOD",
+          "CLOTHING",
+          "HEATING"
+        ]
+      }
+    },
+    {
+      "input_text": "Pahadon par barf gir rahi hai aur humara gaon cut off ho gaya hai. Bimaron ke paas dawai nahi hai aur koi road clear nahi hai.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "STORM",
+            "severity": 3
+          },
+          {
+            "type": "COLD",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          },
+          {
+            "type": "TRANSPORT",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "COLD",
+          "COMMUNICATION_FAILURE"
+        ],
+        "resources": [
+          "MEDICAL_HELP",
+          "TRANSPORT",
+          "HEATING"
+        ]
+      }
+    },
+    {
+      "input_text": "Dharti hil rahi hai do minute se. Kuch buildings gir gayi hain. Log ghabra kar road par bhaag gaye. Koi zakhmi hai.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "EARTHQUAKE",
+            "severity": 4
+          },
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          },
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "EARTHQUAKE",
+          "STRUCTURAL_DAMAGE"
+        ],
+        "resources": [
+          "MEDICAL_HELP",
+          "SEARCH_AND_RESCUE"
+        ]
+      }
+    },
+    {
+      "input_text": "Zordaar bhukamp aaya. Mera ghar gir gaya. Main andar daba hua hoon pair ke neeche. Koi hai jo bachayega?",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "EARTHQUAKE",
+            "severity": 4
+          },
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          },
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "EARTHQUAKE",
+          "STRUCTURAL_DAMAGE"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE",
+          "MEDICAL_HELP"
+        ]
+      }
+    },
+    {
+      "input_text": "Building do taraf se jhuk gayi hai. Upar se malba gir raha hai. Sara saman andar reh gaya. Koi andar nahi ja sakta rescue ke liye.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "EARTHQUAKE",
+          "STRUCTURAL_DAMAGE"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE",
+          "SHELTER"
+        ]
+      }
+    },
+    {
+      "input_text": "School mein bhagdaar mach gaya bhukamp ke baad. Bache staircase par gir gaye. Bohot log zakhmi hain. Ambulance bhejo jaldi.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "EARTHQUAKE",
+            "severity": 3
+          },
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 4
+          },
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "EARTHQUAKE"
+        ],
+        "resources": [
+          "MEDICAL_HELP",
+          "SEARCH_AND_RESCUE"
+        ]
+      }
+    },
+    {
+      "input_text": "Pahad se patthar gir rahe hain raste par. Rasta band hai. Teen gaon ka connection khatam ho gaya. Yahan medical help nahi pahunch sakti.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          },
+          {
+            "type": "TRANSPORT",
+            "severity": 3
+          },
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "EARTHQUAKE",
+          "STRUCTURAL_DAMAGE",
+          "COMMUNICATION_FAILURE"
+        ],
+        "resources": [
+          "MEDICAL_HELP",
+          "TRANSPORT"
+        ]
+      }
+    },
+    {
+      "input_text": "Cylinder se gas leak ho rahi hai poori building mein. Bohot log ko sarr mein dard hai. Koi safe jagah hai yahan se door?",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "GAS_LEAK",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SHELTER",
+            "severity": 4
+          },
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "GAS_LEAK"
+        ],
+        "resources": [
+          "MEDICAL_HELP",
+          "TRANSPORT"
+        ]
+      }
+    },
+    {
+      "input_text": "Andar mat aana! Gas bhari hui hai. Koi light mat karna. Police ko bulao aur logon ko bahar nikalo.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "GAS_LEAK",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SECURITY_PERSONNEL",
+            "severity": 4
+          },
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "GAS_LEAK"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE",
+          "SECURITY_PERSONNEL"
+        ]
+      }
+    },
+    {
+      "input_text": "Pipeline phat gayi sadak ke neeche. Aas paas ke saare ghar mein gas aa rahi hai. Log behosh ho rahe hain ek ek karke.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "GAS_LEAK",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 4
+          },
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "GAS_LEAK",
+          "STRUCTURAL_DAMAGE"
+        ],
+        "resources": [
+          "MEDICAL_HELP",
+          "SEARCH_AND_RESCUE"
+        ]
+      }
+    },
+    {
+      "input_text": "Basement se gas ki smell aa rahi hai kal se. Kisi ne andar ka darwaza band kar diya hai aur chabi nahi mil rahi. Kya karein?",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "GAS_LEAK",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 2
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "GAS_LEAK"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE"
+        ]
+      }
+    },
+    {
+      "input_text": "Factory ke paas rehne walo ko gas leak ki vajah se hospital bhej diya. Ab hum bhi bimari mehsoos kar rahe hain. Ambulance chahiye.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "GAS_LEAK",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "GAS_LEAK"
+        ],
+        "resources": [
+          "MEDICAL_HELP",
+          "TRANSPORT"
+        ]
+      }
+    },
+    {
+      "input_text": "Teen din se light nahi hai. Vaccine fridge mein hai aur kharab ho jayegi. Generator chahiye hospital ke liye.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "POWER_OUTAGE",
+            "severity": 2
+          }
+        ],
+        "resources": [
+          {
+            "type": "ELECTRICITY",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "POWER_OUTAGE"
+        ],
+        "resources": [
+          "ELECTRICITY",
+          "MEDICAL_HELP"
+        ]
+      }
+    },
+    {
+      "input_text": "Mera beta ventilator par hai. Power nahi aayi kal raat se. Woh mar jayega. Please bijli jaldi se bhijwa do kisi tarah.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "POWER_OUTAGE",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "ELECTRICITY",
+            "severity": 4
+          },
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "POWER_OUTAGE"
+        ],
+        "resources": [
+          "ELECTRICITY",
+          "MEDICAL_HELP"
+        ]
+      }
+    },
+    {
+      "input_text": "Transformer blast ho gaya. Pura sheher andhera hai raat ko. Choron ka dar hai. Koi guard chahiye? Police bhi nahi aa rahi.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "POWER_OUTAGE",
+            "severity": 3
+          },
+          {
+            "type": "SECURITY_THREAT",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "SECURITY_PERSONNEL",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "POWER_OUTAGE",
+          "SECURITY_THREAT"
+        ],
+        "resources": [
+          "ELECTRICITY",
+          "SECURITY_PERSONNEL"
+        ]
+      }
+    },
+    {
+      "input_text": "Lift band hai teen din se. Building 12 floor hai. Mera grandfather 10th floor par hai. Dawa khatam ho gayi. Koi le ja sakta hai?",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "POWER_OUTAGE",
+            "severity": 2
+          }
+        ],
+        "resources": [
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "POWER_OUTAGE"
+        ],
+        "resources": [
+          "MEDICAL_HELP",
+          "ELECTRICITY"
+        ]
+      }
+    },
+    {
+      "input_text": "Chakki band hai bijli nahi hai. Aata khatam ho gaya. Koi mill nahi chal raha. Chote bache hain ghar mein kuch nahi hai khane ko.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "POWER_OUTAGE",
+            "severity": 2
+          }
+        ],
+        "resources": [
+          {
+            "type": "FOOD",
+            "severity": 4
+          },
+          {
+            "type": "ELECTRICITY",
+            "severity": 2
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "POWER_OUTAGE"
+        ],
+        "resources": [
+          "FOOD",
+          "ELECTRICITY"
+        ]
+      }
+    },
+    {
+      "input_text": "Chhat mein se paani tapak raha hai aur deewar mein bohot badi cracks hain. Lagta hai ghar kab bhi gir sakta hai.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 4
+          },
+          {
+            "type": "STORM",
+            "severity": 2
+          }
+        ],
+        "resources": [
+          {
+            "type": "SHELTER",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "STRUCTURAL_DAMAGE"
+        ],
+        "resources": [
+          "SHELTER"
+        ]
+      }
+    },
+    {
+      "input_text": "Pul ka hissa dhah gaya baarish mein. Hum is side phase hain aur doosri taraf medical camp hai. Koi aur rasta nahi hai.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "STORM",
+            "severity": 2
+          },
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "TRANSPORT",
+            "severity": 3
+          },
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "STRUCTURAL_DAMAGE",
+          "FLOODS"
+        ],
+        "resources": [
+          "TRANSPORT",
+          "MEDICAL_HELP"
+        ]
+      }
+    },
+    {
+      "input_text": "Building ki foundation kamzor ho gayi hai baarish ki vajah se. Upar se naya construction chal raha hai. Hum log dar gaye hain.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 3
+          },
+          {
+            "type": "STORM",
+            "severity": 2
+          }
+        ],
+        "resources": [
+          {
+            "type": "SHELTER",
+            "severity": 3
+          },
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 2
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "STRUCTURAL_DAMAGE",
+          "FLOODS"
+        ],
+        "resources": [
+          "SHELTER",
+          "TRANSPORT"
+        ]
+      }
+    },
+    {
+      "input_text": "Raste mein bada gadha ho gaya. Pani ka pipeline phat gaya. Saari sadak paani se bhar gayi aur traffic band hai.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "FLOODS",
+            "severity": 2
+          },
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 2
+          }
+        ],
+        "resources": []
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "STRUCTURAL_DAMAGE"
+        ],
+        "resources": [
+          "WATER",
+          "TRANSPORT"
+        ]
+      }
+    },
+    {
+      "input_text": "Mera ghar thoda hil gaya hai bhukamp se. Deewar mein cracks hain lekin abhi gir nahi raha. Kya karein? Safe hai ya nahi?",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "EARTHQUAKE",
+            "severity": 2
+          },
+          {
+            "type": "STRUCTURAL_DAMAGE",
+            "severity": 2
+          }
+        ],
+        "resources": [
+          {
+            "type": "SHELTER",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "STRUCTURAL_DAMAGE",
+          "EARTHQUAKE"
+        ],
+        "resources": [
+          "SHELTER"
+        ]
+      }
+    },
+    {
+      "input_text": "Gaon mein bahar ke log aa gaye raat ko. Ghar mein ghus kar samaan le gaye. Do log ko maara. Police bulane ka number nahi hai.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "SECURITY_THREAT",
+            "severity": 4
+          },
+          {
+            "type": "COMMUNICATION_FAILURE",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "SECURITY_PERSONNEL",
+            "severity": 4
+          },
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "SECURITY_THREAT",
+          "COMMUNICATION_FAILURE"
+        ],
+        "resources": [
+          "SECURITY_PERSONNEL",
+          "MEDICAL_HELP"
+        ]
+      }
+    },
+    {
+      "input_text": "Do group aapas mein lad rahe hain sadak par. Pathar chal rahe hain. Kisi ne goli bhi chalayi. School mein bache phase hain andar.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "SECURITY_THREAT",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SECURITY_PERSONNEL",
+            "severity": 4
+          },
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "SECURITY_THREAT"
+        ],
+        "resources": [
+          "SECURITY_PERSONNEL",
+          "SEARCH_AND_RESCUE"
+        ]
+      }
+    },
+    {
+      "input_text": "Naxalite area mein phase hain. Road par blast hua hai. Koi aage nahi badh sakta. Ration khatam hone wala hai do din mein.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "SECURITY_THREAT",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "FOOD",
+            "severity": 3
+          },
+          {
+            "type": "TRANSPORT",
+            "severity": 3
+          },
+          {
+            "type": "SECURITY_PERSONNEL",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "SECURITY_THREAT"
+        ],
+        "resources": [
+          "FOOD",
+          "SECURITY_PERSONNEL"
+        ]
+      }
+    },
+    {
+      "input_text": "Mere pati ko kuch log le gaye kal raat. Do din se koi news nahi hai. Police thane mein baithi hai kuch nahi kar rahi.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "SECURITY_THREAT",
+            "severity": 4
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          },
+          {
+            "type": "SECURITY_PERSONNEL",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "SECURITY_THREAT"
+        ],
+        "resources": [
+          "SECURITY_PERSONNEL"
+        ]
+      }
+    },
+    {
+      "input_text": "Andar mat aana ghar mein chor hai. Teen aadmi bahar khade hain. Hum log andar band hain. Koi bulao police ko.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "SECURITY_THREAT",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "SECURITY_PERSONNEL",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "SECURITY_THREAT"
+        ],
+        "resources": [
+          "SECURITY_PERSONNEL"
+        ]
+      }
+    },
+    {
+      "input_text": "Network band hai do din se. Kisi ko call nahi kar sakta. Aap yeh message kabhi dekhenge toh help karna yahan sab log phase hain.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "COMMUNICATION_FAILURE",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "COMMUNICATION_FAILURE"
+        ],
+        "resources": []
+      }
+    },
+    {
+      "input_text": "Bhai mere ghar wale earthquake ke baad se contact nahi ho rahe. Main doosre sheher mein hoon. Koi batao wahan kya situation hai.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "EARTHQUAKE",
+            "severity": 2
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "COMMUNICATION_FAILURE",
+          "EARTHQUAKE"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE"
+        ]
+      }
+    },
+    {
+      "input_text": "Radio bhi kaam nahi kar raha. Koi information nahi hai ki rescue kab aayega. Hum andhere mein baithe hain do din se.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "COMMUNICATION_FAILURE",
+            "severity": 2
+          },
+          {
+            "type": "POWER_OUTAGE",
+            "severity": 2
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 3
+          },
+          {
+            "type": "ELECTRICITY",
+            "severity": 2
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "COMMUNICATION_FAILURE",
+          "POWER_OUTAGE"
+        ],
+        "resources": [
+          "ELECTRICITY"
+        ]
+      }
+    },
+    {
+      "input_text": "Cyclone ke baad se network aata jaata rehta hai. SMS bhejta hoon toh kabhi pahunchta hai kabhi nahi. Kisi ko mil raha hai toh batao hum yahan phase hain.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [
+          {
+            "type": "STORM",
+            "severity": 2
+          },
+          {
+            "type": "COMMUNICATION_FAILURE",
+            "severity": 3
+          }
+        ],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "COMMUNICATION_FAILURE",
+          "STORM"
+        ],
+        "resources": [
+          "FOOD",
+          "WATER"
+        ]
+      }
+    },
+    {
+      "input_text": "Mera bhai jungle trek par gaya tha. Do din se uska koi contact nahi mil raha. Teen bache hain uske saath. Koi rescue team bhejo.",
+      "reference": {
+        "intent": "REQUEST",
+        "hazards": [],
+        "resources": [
+          {
+            "type": "SEARCH_AND_RESCUE",
+            "severity": 4
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "REQUEST",
+        "hazards": [
+          "COMMUNICATION_FAILURE"
+        ],
+        "resources": [
+          "SEARCH_AND_RESCUE",
+          "FOOD",
+          "WATER"
+        ]
+      }
+    },
+    {
+      "input_text": "Hamare paas do truck hain. Bhatgaon se relief material le ja sakte hain jahan bhejna hai. Batao kahan deliver karna hai.",
+      "reference": {
+        "intent": "OFFER",
+        "hazards": [],
+        "resources": [
+          {
+            "type": "TRANSPORT",
+            "severity": 2
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "OFFER",
+        "hazards": [],
+        "resources": [
+          "TRANSPORT"
+        ]
+      }
+    },
+    {
+      "input_text": "I am a doctor with 5 years emergency experience. I have set up a small clinic in the school. Can treat 50 patients daily. Need more supplies.",
+      "reference": {
+        "intent": "OFFER",
+        "hazards": [],
+        "resources": [
+          {
+            "type": "MEDICAL_HELP",
+            "severity": 3
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "OFFER",
+        "hazards": [],
+        "resources": [
+          "MEDICAL_HELP"
+        ]
+      }
+    },
+    {
+      "input_text": "Hamare paas 500 food packets ready hain. Donation ke liye. Kaise distribute karein aur kahan bhejein? Let us know.",
+      "reference": {
+        "intent": "OFFER",
+        "hazards": [],
+        "resources": [
+          {
+            "type": "FOOD",
+            "severity": 2
+          }
+        ]
+      },
+      "reference_hints": {
+        "intent": "OFFER",
+        "hazards": [],
+        "resources": [
+          "FOOD",
+          "TRANSPORT"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,356 @@
+{
+  "pipeline_model": "gemma4:31b-cloud",
+  "golden_model": "minimax-m3:cloud",
+  "total": 53,
+  "exact_match": {
+    "intent": 52,
+    "intent_pct": 98.1,
+    "hazard": 49,
+    "hazard_pct": 92.5,
+    "resource": 36,
+    "resource_pct": 67.9
+  },
+  "subset_match": {
+    "intent": 52,
+    "intent_pct": 98.1,
+    "hazard": 49,
+    "hazard_pct": 92.5,
+    "resource": 42,
+    "resource_pct": 79.2
+  },
+  "hazard_category": {
+    "COLD": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 100.0,
+      "recall": 100.0
+    },
+    "COMMUNICATION_FAILURE": {
+      "tp": 4,
+      "fp": 1,
+      "fn": 0,
+      "precision": 80.0,
+      "recall": 100.0
+    },
+    "EARTHQUAKE": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 100.0,
+      "recall": 100.0
+    },
+    "FIRE": {
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 100.0,
+      "recall": 100.0
+    },
+    "FLOODS": {
+      "tp": 7,
+      "fp": 1,
+      "fn": 0,
+      "precision": 87.5,
+      "recall": 100.0
+    },
+    "GAS_LEAK": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 100.0,
+      "recall": 100.0
+    },
+    "POWER_OUTAGE": {
+      "tp": 6,
+      "fp": 1,
+      "fn": 0,
+      "precision": 85.7,
+      "recall": 100.0
+    },
+    "SECURITY_THREAT": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 100.0,
+      "recall": 100.0
+    },
+    "STORM": {
+      "tp": 7,
+      "fp": 0,
+      "fn": 1,
+      "precision": 100.0,
+      "recall": 87.5
+    },
+    "STRUCTURAL_DAMAGE": {
+      "tp": 13,
+      "fp": 1,
+      "fn": 0,
+      "precision": 92.9,
+      "recall": 100.0
+    }
+  },
+  "resource_category": {
+    "CLOTHING": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 100.0,
+      "recall": 100.0
+    },
+    "ELECTRICITY": {
+      "tp": 4,
+      "fp": 1,
+      "fn": 0,
+      "precision": 80.0,
+      "recall": 100.0
+    },
+    "FOOD": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 100.0,
+      "recall": 100.0
+    },
+    "HEATING": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 100.0,
+      "recall": 100.0
+    },
+    "MEDICAL_HELP": {
+      "tp": 20,
+      "fp": 1,
+      "fn": 2,
+      "precision": 95.2,
+      "recall": 90.9
+    },
+    "SEARCH_AND_RESCUE": {
+      "tp": 23,
+      "fp": 4,
+      "fn": 1,
+      "precision": 85.2,
+      "recall": 95.8
+    },
+    "SECURITY_PERSONNEL": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 1,
+      "precision": 100.0,
+      "recall": 85.7
+    },
+    "SHELTER": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 4,
+      "precision": 100.0,
+      "recall": 42.9
+    },
+    "TRANSPORT": {
+      "tp": 8,
+      "fp": 5,
+      "fn": 1,
+      "precision": 61.5,
+      "recall": 88.9
+    },
+    "WATER": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "precision": 100.0,
+      "recall": 50.0
+    }
+  },
+  "avg_retries": 0.4,
+  "messages_with_retries": 9,
+  "retries_exhausted": 6,
+  "intent_disagreements": [
+    {
+      "text": "I am a doctor with 5 years emergency experience. I have set up a small clinic in",
+      "pipeline": "REQUEST",
+      "ref": "OFFER",
+      "retries": 0
+    }
+  ],
+  "hazard_disagreements": [
+    {
+      "text": "Bijli ki wiring mein short circuit hua. Building ke neeche se dhuaan aa raha hai",
+      "pipeline": [
+        "FIRE",
+        "POWER_OUTAGE"
+      ],
+      "ref": [
+        "FIRE"
+      ],
+      "subset": false,
+      "retries": 3
+    },
+    {
+      "text": "Chhat mein se paani tapak raha hai aur deewar mein bohot badi cracks hain. Lagta",
+      "pipeline": [
+        "FLOODS",
+        "STRUCTURAL_DAMAGE"
+      ],
+      "ref": [
+        "STORM",
+        "STRUCTURAL_DAMAGE"
+      ],
+      "subset": false,
+      "retries": 3
+    },
+    {
+      "text": "Naxalite area mein phase hain. Road par blast hua hai. Koi aage nahi badh sakta.",
+      "pipeline": [
+        "SECURITY_THREAT",
+        "STRUCTURAL_DAMAGE"
+      ],
+      "ref": [
+        "SECURITY_THREAT"
+      ],
+      "subset": false,
+      "retries": 0
+    },
+    {
+      "text": "Mera bhai jungle trek par gaya tha. Do din se uska koi contact nahi mil raha. Te",
+      "pipeline": [
+        "COMMUNICATION_FAILURE"
+      ],
+      "ref": [],
+      "subset": false,
+      "retries": 0
+    }
+  ],
+  "resource_disagreements": [
+    {
+      "text": "Water coming from all sides. Five families stuck on first floor with small child",
+      "pipeline": [
+        "SEARCH_AND_RESCUE",
+        "TRANSPORT"
+      ],
+      "ref": [
+        "SEARCH_AND_RESCUE"
+      ],
+      "subset": false,
+      "retries": 0
+    },
+    {
+      "text": "Nadi ka paani har ghante badh raha hai. Humara ghar bahut neeche hai. Koi naav h",
+      "pipeline": [
+        "SEARCH_AND_RESCUE",
+        "TRANSPORT"
+      ],
+      "ref": [
+        "TRANSPORT"
+      ],
+      "subset": false,
+      "retries": 0
+    },
+    {
+      "text": "Peda! Peda gir rahe hain! Teen ped hamare ghar ke upar gir gaye. Maa andar phase",
+      "pipeline": [
+        "MEDICAL_HELP",
+        "SEARCH_AND_RESCUE"
+      ],
+      "ref": [
+        "SEARCH_AND_RESCUE"
+      ],
+      "subset": false,
+      "retries": 0
+    },
+    {
+      "text": "Jungle mein aag lag gayi. Hawa ki taraf se gaon ki taraf badh rahi hai. Sab log ",
+      "pipeline": [
+        "SEARCH_AND_RESCUE",
+        "TRANSPORT"
+      ],
+      "ref": [
+        "SEARCH_AND_RESCUE",
+        "SHELTER"
+      ],
+      "subset": false,
+      "retries": 3
+    },
+    {
+      "text": "Basement se gas ki smell aa rahi hai kal se. Kisi ne andar ka darwaza band kar d",
+      "pipeline": [
+        "SEARCH_AND_RESCUE"
+      ],
+      "ref": [
+        "MEDICAL_HELP"
+      ],
+      "subset": false,
+      "retries": 3
+    },
+    {
+      "text": "Factory ke paas rehne walo ko gas leak ki vajah se hospital bhej diya. Ab hum bh",
+      "pipeline": [
+        "MEDICAL_HELP",
+        "TRANSPORT"
+      ],
+      "ref": [
+        "MEDICAL_HELP"
+      ],
+      "subset": false,
+      "retries": 0
+    },
+    {
+      "text": "Transformer blast ho gaya. Pura sheher andhera hai raat ko. Choron ka dar hai. K",
+      "pipeline": [
+        "ELECTRICITY",
+        "SECURITY_PERSONNEL"
+      ],
+      "ref": [
+        "SECURITY_PERSONNEL"
+      ],
+      "subset": false,
+      "retries": 0
+    },
+    {
+      "text": "Lift band hai teen din se. Building 12 floor hai. Mera grandfather 10th floor pa",
+      "pipeline": [
+        "MEDICAL_HELP",
+        "TRANSPORT"
+      ],
+      "ref": [
+        "MEDICAL_HELP"
+      ],
+      "subset": false,
+      "retries": 0
+    },
+    {
+      "text": "Chhat mein se paani tapak raha hai aur deewar mein bohot badi cracks hain. Lagta",
+      "pipeline": [
+        "SEARCH_AND_RESCUE",
+        "SHELTER"
+      ],
+      "ref": [
+        "SHELTER"
+      ],
+      "subset": false,
+      "retries": 3
+    },
+    {
+      "text": "Pul ka hissa dhah gaya baarish mein. Hum is side phase hain aur doosri taraf med",
+      "pipeline": [
+        "SEARCH_AND_RESCUE",
+        "TRANSPORT"
+      ],
+      "ref": [
+        "MEDICAL_HELP",
+        "TRANSPORT"
+      ],
+      "subset": false,
+      "retries": 0
+    },
+    {
+      "text": "Raste mein bada gadha ho gaya. Pani ka pipeline phat gaya. Saari sadak paani se ",
+      "pipeline": [
+        "TRANSPORT"
+      ],
+      "ref": [],
+      "subset": false,
+      "retries": 0
+    }
+  ]
+}
