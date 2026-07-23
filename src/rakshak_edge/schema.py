@@ -1,13 +1,13 @@
 import enum
 from typing import List, Literal
 
-from pydantic import BaseModel, Field, AliasChoices
+from pydantic import AliasChoices, BaseModel, Field
 
 
-class Priority(enum.IntEnum):
-    LOW = 1
-    HIGH = 2
-    CRITICAL = 3
+class Priority(enum.Enum):
+    LOW = "LOW"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
 
 
 class Severity(enum.IntEnum):
@@ -18,7 +18,6 @@ class Severity(enum.IntEnum):
 
 
 class Hazard(BaseModel):
-    # ponytail: accept type/hazard/name — Gemma uses different field names per message
     name: str = Field(
         serialization_alias="type",
         validation_alias=AliasChoices("type", "hazard", "name"),

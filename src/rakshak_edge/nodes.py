@@ -1,32 +1,43 @@
 from rakshak_edge.llm import get_llm
 from rakshak_edge.prompts import final_prompt, verify_prompt
+from rakshak_edge.schema import ParsedMessage, Priority, TriageOutput
 from rakshak_edge.state import TriageState
-from rakshak_edge.schema import ParsedMessage, TriageOutput, Priority
 
 llm = get_llm()
 
 
-def parse_node(state: TriageState) -> dict:
+async def parse_node(state: TriageState) -> dict:
     chain = final_prompt | llm.with_structured_output(ParsedMessage)
-    response: ParsedMessage = chain.invoke({"input_text": state["message"]})
+    response: ParsedMessage = await chain.ainvoke({"input_text": state["message"]})
     return {"parsed": response}
 
 
-def verify_node(state: TriageState) -> dict:
+async def verify_node(state: TriageState) -> dict:
     parsed = state["parsed"]
 
-    hazards_str = ", ".join(f"{h.name} (severity={h.severity.value})" for h in parsed.hazards) or "none"
-    resources_str = ", ".join(f"{r.name} (severity={r.severity.value})" for r in parsed.resources) or "none"
+    hazards_str = (
+        ", ".join(f"{h.name} (severity={h.severity.value})" for h in parsed.hazards)
+        or "none"
+    )
+    resources_str = (
+        ", ".join(f"{r.name} (severity={r.severity.value})" for r in parsed.resources)
+        or "none"
+    )
     extracted = (
-        f"Intent: {parsed.intent}\n"
-        f"Hazards: {hazards_str}\n"
-        f"Resources: {resources_str}"
+        f"Intent: {parsed.intent}\nHazards: {hazards_str}\nResources: {resources_str}"
     )
 
     verify_chain = verify_prompt | llm
-    r = verify_chain.invoke({"message": state["message"], "extracted": extracted})
+    r = await verify_chain.ainvoke({
+        "message": state["message"],
+        "extracted": extracted,
+    })
     text = r.content.strip()
-    errors = [] if text == "NONE" else [line.strip() for line in text.split("\n") if line.strip()]
+    errors = (
+        []
+        if text == "NONE"
+        else [line.strip() for line in text.split("\n") if line.strip()]
+    )
 
     return {"verification_errors": errors}
 

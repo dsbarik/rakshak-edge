@@ -434,18 +434,30 @@ uv sync
 echo "OLLAMA_API_KEY=your-key-here" > .env
 ```
 
-### Usage
+### Usage (API)
+
+```bash
+# Start the API server
+uv run uvicorn api.main:app --reload
+```
 
 ```bash
 # Triage a single message
-uv run python -m rakshak_edge "Need food and water, we are stranded after the storm"
+curl -X POST http://localhost:8000/triage \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Need food and water, we are stranded after the storm"}'
+```
 
-# Triage a batch of messages
-uv run python -m rakshak_edge --batch data/structured/disaster_response_messages_validation.json
+```bash
+# Health check
+curl http://localhost:8000/health
+```
 
-# Start the API server
-uv run uvicorn api.main:app --reload
+Open [http://localhost:8000/docs](http://localhost:8000/docs) for the interactive Swagger UI.
 
+### Scripts
+
+```bash
 # Generate synthetic training data (53 India-focused SMS)
 uv run python scripts/generate_synthetic.py
 

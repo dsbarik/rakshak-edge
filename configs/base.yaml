@@ -1,5 +1,5 @@
 llm:
-  model_name: "gemma4:cloud"
+  model_name: "gemma4:31b-cloud"
   temperature: 0.0
   use_auth: true
 

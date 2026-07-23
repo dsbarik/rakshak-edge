@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rakshak Edge — Disaster Triage</title>
+<link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><span class="shield">🛡</span> Rakshak Edge</h1>
+    <p class="subtitle">Agentic disaster message triage — parse, verify, and prioritize emergency SMS</p>
+  </header>
+
+  <div class="examples">
+    <form method="GET" action="/">
+      <input type="hidden" name="message" value="Need food and water, stranded after the storm">
+      <button class="btn btn-example" type="submit">Storm</button>
+    </form>
+    <form method="GET" action="/">
+      <input type="hidden" name="message" value="People are trapped under collapsed buildings after the earthquake">
+      <button class="btn btn-example" type="submit">Earthquake</button>
+    </form>
+    <form method="GET" action="/">
+      <input type="hidden" name="message" value="We have two trucks available to transport supplies">
+      <button class="btn btn-example" type="submit">Offer</button>
+    </form>
+    <form method="GET" action="/">
+      <input type="hidden" name="message" value="Bandh toot gaya. Saara gaon doob gaya. Do din se kuch nahi khaya hai. Bache ro rahe hain.">
+      <button class="btn btn-example" type="submit">Hindi</button>
+    </form>
+  </div>
+
+  <form method="POST" action="/">
+    <div class="form-group">
+      <textarea name="message" placeholder="Paste an emergency SMS message here..." rows="4" required>{{ original_message }}</textarea>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">Triage</button>
+      <a href="/" class="btn btn-ghost">Clear</a>
+    </div>
+  </form>
+
+  {% if error %}
+  <div class="alert alert-error">
+    <strong>Error:</strong> {{ error }}
+  </div>
+  {% endif %}
+
+  {% if result %}
+  <div class="result-card priority-{{ result.priority_level|lower }}">
+    <div class="result-header">
+      <span class="badge badge-intent">{{ result.intent }}</span>
+      <span class="badge badge-priority priority-{{ result.priority_level|lower }}">{{ result.priority_level }}</span>
+    </div>
+
+    {% if result.hazards %}
+    <div class="result-section">
+      <h3>Hazards</h3>
+      <ul class="item-list">
+        {% for h in result.hazards %}
+        <li><span class="item-type">{{ h.type }}</span> <span class="severity">severity {{ h.severity }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if result.resources %}
+    <div class="result-section">
+      <h3>Resources</h3>
+      <ul class="item-list">
+        {% for r in result.resources %}
+        <li><span class="item-type">{{ r.type }}</span> <span class="severity">severity {{ r.severity }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if not result.hazards and not result.resources %}
+    <div class="result-section">
+      <p class="text-muted">No hazards or resources detected.</p>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+</body>
+</html>

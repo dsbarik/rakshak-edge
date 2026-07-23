@@ -1,3 +1,3 @@
-from rakshak_edge.main import triage
+from rakshak_edge.pipeline import triage
 
 __all__ = ["triage"]
