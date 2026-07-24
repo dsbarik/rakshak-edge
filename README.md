@@ -416,27 +416,43 @@ The most impactful optimization came from treating prompts as testable hypothese
 
 ### Prerequisites
 
+**Option 1 — Docker (recommended):**
+- <a href="https://www.docker.com/">Docker</a>
+
+**Option 2 — Local development:**
 - Python 3.12+
 - <a href="https://docs.astral.sh/uv/">uv</a> (fast Python package manager)
-- <a href="https://ollama.com/">Ollama</a> with a model pulled (e.g., <code>gemma4:cloud</code> or <code>phi4-mini</code>)
 
 ### Setup
 
+#### 🐳 Docker (recommended)
+
 ```bash
-# Clone
+git clone https://github.com/your-username/rakshak-edge
+cd rakshak-edge
+
+# Add your API key
+cp .env.example .env
+# Edit .env with your OLLAMA_API_KEY
+
+# Build and run
+docker compose up
+```
+
+Open [http://localhost:8000](http://localhost:8000).
+
+#### 📦 Local (uv)
+
+```bash
 git clone https://github.com/your-username/rakshak-edge
 cd rakshak-edge
 
 # Install dependencies
 uv sync
 
-# Set your Ollama API key
+# Set your API key
 echo "OLLAMA_API_KEY=your-key-here" > .env
-```
 
-### Usage (API)
-
-```bash
 # Start the API server
 uv run uvicorn api.main:app --reload
 ```
@@ -487,6 +503,10 @@ nodes:
 
 <pre>
 rakshak-edge/
+├── Dockerfile                # Container image
+├── docker-compose.yml        # Container orchestration
+├── .dockerignore             # Docker build exclusions
+├── .env.example              # Environment variable template
 ├── api/                      # FastAPI server
 │   └── main.py               # /triage and /health endpoints
 ├── src/rakshak_edge/         # Core pipeline
@@ -521,7 +541,8 @@ rakshak-edge/
 - <b><a href="https://www.langchain.com/">LangChain</a></b> for LLM integration and prompt templating
 - <b><a href="https://docs.pydantic.dev/">Pydantic</a></b> for structured output parsing
 - <b><a href="https://fastapi.tiangolo.com/">FastAPI</a></b> for HTTP API server
-- <b><a href="https://ollama.com/">Ollama</a></b> for local LLM inference
+- <b><a href="https://ollama.com/">Ollama</a></b> for cloud LLM inference
+- <b><a href="https://docs.docker.com/">Docker</a></b> for containerized deployment
 - <b><a href="https://rich.readthedocs.io/">Rich</a></b> for CLI output formatting
 
 ---
