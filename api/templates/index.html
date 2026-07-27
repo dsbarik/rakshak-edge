@@ -4,87 +4,137 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rakshak Edge — Disaster Triage</title>
-<link rel="stylesheet" href="/static/css/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div class="container">
-  <header>
-    <h1><span class="shield">🛡</span> Rakshak Edge</h1>
-    <p class="subtitle">Agentic disaster message triage — parse, verify, and prioritize emergency SMS</p>
-  </header>
+<body class="font-sans bg-gray-950 text-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-6">
+  <div class="w-full max-w-3xl mx-auto">
+    <header class="mb-6 sm:mb-8">
+      <h1 class="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+        <span class="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-lg">
+          <span role="img" aria-label="shield">🛡</span>
+        </span>
+        Rakshak Edge
+      </h1>
+      <p class="text-sm sm:text-base text-gray-400 mt-2">Agentic disaster message triage — parse, verify, and prioritize emergency SMS</p>
+    </header>
 
-  <div class="examples">
-    <form method="GET" action="/">
-      <input type="hidden" name="message" value="Need food and water, stranded after the storm">
-      <button class="btn btn-example" type="submit">Storm</button>
-    </form>
-    <form method="GET" action="/">
-      <input type="hidden" name="message" value="People are trapped under collapsed buildings after the earthquake">
-      <button class="btn btn-example" type="submit">Earthquake</button>
-    </form>
-    <form method="GET" action="/">
-      <input type="hidden" name="message" value="We have two trucks available to transport supplies">
-      <button class="btn btn-example" type="submit">Offer</button>
-    </form>
-    <form method="GET" action="/">
-      <input type="hidden" name="message" value="Bandh toot gaya. Saara gaon doob gaya. Do din se kuch nahi khaya hai. Bache ro rahe hain.">
-      <button class="btn btn-example" type="submit">Hindi</button>
-    </form>
-  </div>
-
-  <form method="POST" action="/">
-    <div class="form-group">
-      <textarea name="message" placeholder="Paste an emergency SMS message here..." rows="4" required>{{ original_message }}</textarea>
+    <div class="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6">
+      <form method="GET" action="/" class="inline">
+        <input type="hidden" name="message" value="Need food and water, stranded after the storm">
+        <button type="submit" class="px-3 py-1.5 sm:px-4 sm:py-2 text-sm bg-gray-900 border border-gray-700 text-gray-300 rounded-full hover:border-blue-500 hover:text-gray-100 transition-colors">Storm</button>
+      </form>
+      <form method="GET" action="/" class="inline">
+        <input type="hidden" name="message" value="People are trapped under collapsed buildings after the earthquake">
+        <button type="submit" class="px-3 py-1.5 sm:px-4 sm:py-2 text-sm bg-gray-900 border border-gray-700 text-gray-300 rounded-full hover:border-blue-500 hover:text-gray-100 transition-colors">Earthquake</button>
+      </form>
+      <form method="GET" action="/" class="inline">
+        <input type="hidden" name="message" value="We have two trucks available to transport supplies">
+        <button type="submit" class="px-3 py-1.5 sm:px-4 sm:py-2 text-sm bg-gray-900 border border-gray-700 text-gray-300 rounded-full hover:border-blue-500 hover:text-gray-100 transition-colors">Offer</button>
+      </form>
+      <form method="GET" action="/" class="inline">
+        <input type="hidden" name="message" value="Bandh toot gaya. Saara gaon doob gaya. Do din se kuch nahi khaya hai. Bache ro rahe hain.">
+        <button type="submit" class="px-3 py-1.5 sm:px-4 sm:py-2 text-sm bg-gray-900 border border-gray-700 text-gray-300 rounded-full hover:border-blue-500 hover:text-gray-100 transition-colors">Hinglish</button>
+      </form>
     </div>
 
-    <div class="form-actions">
-      <button class="btn btn-primary" type="submit">Triage</button>
-      <a href="/" class="btn btn-ghost">Clear</a>
-    </div>
-  </form>
+    <form method="POST" action="/" id="triage-form" class="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div>
+        <textarea name="message" placeholder="Paste an emergency SMS message here..." rows="4" required 
+                  class="w-full px-3 py-2.5 sm:px-4 sm:py-3 bg-gray-950 border border-gray-700 text-gray-100 text-sm sm:text-base rounded-lg focus:outline-none focus:border-blue-500 resize-vertical min-h-[100px]">{{ original_message }}</textarea>
+      </div>
 
-  {% if error %}
-  <div class="alert alert-error">
-    <strong>Error:</strong> {{ error }}
-  </div>
-  {% endif %}
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center">
+        <button type="submit" class="w-full sm:w-auto px-6 py-2.5 sm:px-8 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">Triage</button>
+        <a href="/" class="w-full sm:w-auto px-6 py-2.5 sm:px-8 sm:py-3 text-gray-300 font-medium hover:text-gray-100 transition-colors text-center">Clear</a>
+      </div>
+    </form>
 
-  {% if result %}
-  <div class="result-card priority-{{ result.priority_level|lower }}">
-    <div class="result-header">
-      <span class="badge badge-intent">{{ result.intent }}</span>
-      <span class="badge badge-priority priority-{{ result.priority_level|lower }}">{{ result.priority_level }}</span>
-    </div>
-
-    {% if result.hazards %}
-    <div class="result-section">
-      <h3>Hazards</h3>
-      <ul class="item-list">
-        {% for h in result.hazards %}
-        <li><span class="item-type">{{ h.type }}</span> <span class="severity">severity {{ h.severity }}</span></li>
-        {% endfor %}
-      </ul>
+    {% if error %}
+    <div class="mt-6 p-4 bg-red-950 border border-red-800 rounded-lg">
+      <p class="text-red-200"><strong>Error:</strong> {{ error }}</p>
     </div>
     {% endif %}
 
-    {% if result.resources %}
-    <div class="result-section">
-      <h3>Resources</h3>
-      <ul class="item-list">
-        {% for r in result.resources %}
-        <li><span class="item-type">{{ r.type }}</span> <span class="severity">severity {{ r.severity }}</span></li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
+    {% if result %}
+    <div class="mt-6 bg-gray-900 border border-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <!-- Top bar: intent + priority -->
+      <div class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-800">
+        <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold font-mono tracking-wide rounded bg-blue-950/60 text-blue-300 border border-blue-800/40">{{ result.intent }}</span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded
+          {% if result.priority_level == 'CRITICAL' %}bg-red-950/70 text-red-300 border border-red-800/50{% elif result.priority_level == 'HIGH' %}bg-amber-950/70 text-amber-300 border border-amber-800/50{% else %}bg-emerald-950/70 text-emerald-300 border border-emerald-800/50{% endif %}">
+          {% if result.priority_level == 'CRITICAL' %}
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+          {% elif result.priority_level == 'HIGH' %}
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd"/></svg>
+          {% else %}
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+          {% endif %}
+          {{ result.priority_level }}
+        </span>
+      </div>
 
-    {% if not result.hazards and not result.resources %}
-    <div class="result-section">
-      <p class="text-muted">No hazards or resources detected.</p>
+      <div class="px-4 sm:px-6 py-4 space-y-5">
+        <!-- Hazards -->
+        {% if result.hazards %}
+        <div>
+          <h3 class="text-[11px] font-mono text-gray-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+            Hazards
+            <span class="text-gray-600 font-normal normal-case">({{ result.hazards|length }})</span>
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {% for h in result.hazards %}
+            <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-950/50 border border-gray-800/60">
+              <span class="text-sm text-gray-200 font-medium">{{ h.type | replace("_", " ") }}</span>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-mono font-semibold rounded
+                {% if h.severity >= 4 %}bg-red-900/40 text-red-300{% elif h.severity == 3 %}bg-orange-900/40 text-orange-300{% elif h.severity == 2 %}bg-yellow-900/40 text-yellow-300{% else %}bg-gray-800 text-gray-400{% endif %}">
+                {{ h.severity }}/4
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Resources -->
+        {% if result.resources %}
+        <div>
+          <h3 class="text-[11px] font-mono text-gray-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+            Resources
+            <span class="text-gray-600 font-normal normal-case">({{ result.resources|length }})</span>
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {% for r in result.resources %}
+            <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-950/50 border border-gray-800/60">
+              <span class="text-sm text-gray-200 font-medium">{{ r.type | replace("_", " ") }}</span>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-mono font-semibold rounded
+                {% if r.severity >= 4 %}bg-red-900/40 text-red-300{% elif r.severity == 3 %}bg-orange-900/40 text-orange-300{% elif r.severity == 2 %}bg-yellow-900/40 text-yellow-300{% else %}bg-gray-800 text-gray-400{% endif %}">
+                {{ r.severity }}/4
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if not result.hazards and not result.resources %}
+        <p class="text-sm text-gray-500 text-center py-2">No hazards or resources detected.</p>
+        {% endif %}
+      </div>
     </div>
     {% endif %}
   </div>
-  {% endif %}
-</div>
+
+  <script>
+    // Disable Triage button during form submission
+    document.getElementById('triage-form')?.addEventListener('submit', function(e) {
+      const button = this.querySelector('button[type="submit"]');
+      if (button) {
+        button.disabled = true;
+        button.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    });
+  </script>
 </body>
 </html>
