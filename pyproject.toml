@@ -1,7 +1,7 @@
 [project]
 name = "rakshak-edge"
 version = "0.1.0"
-description = "Add your description here"
+description = "Agentic disaster message triage pipeline"
 readme = "README.md"
 authors = [
     { name = "Dibya S. Barik", email = "barikdibyasamapd@gmail.com" }

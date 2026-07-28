@@ -340,7 +340,11 @@ curl -X POST http://localhost:8000/triage \
 ### Start the Server
 
 ```bash
-uv run uvicorn api.main:app --reload
+# Production
+uv run fastapi run
+
+# Development (with hot reload)
+uv run fastapi dev
 ```
 
 ---
@@ -403,10 +407,10 @@ uv sync
 
 # Set your API key
 echo "OLLAMA_API_KEY=your-key-here" > .env
-
 # Start the API server
-uv run uvicorn api.main:app --reload
+uv run fastapi dev
 ```
+
 
 ```bash
 # Triage a single message
@@ -440,7 +444,7 @@ uv run python scripts/compare_golden.py
 ```yaml
 # configs/base.yaml
 llm:
-  model_name: "gemma4:cloud" # swap models here
+  model_name: "gemma4:31b-cloud" # swap models here
   temperature: 0.0
   use_auth: true
 
@@ -458,8 +462,13 @@ rakshak-edge/
 ├── docker-compose.yml        # Container orchestration
 ├── .dockerignore             # Docker build exclusions
 ├── .env.example              # Environment variable template
-├── api/                      # FastAPI server
-│   └── main.py               # /triage and /health endpoints
+├── src/app/                  # FastAPI server
+│   ├── __init__.py
+│   ├── main.py               # /triage and /health endpoints
+│   ├── static/
+│   │   └── css/styles.css
+│   └── templates/
+│       └── index.html
 ├── src/rakshak_edge/         # Core pipeline
 │   ├── graph.py              # LangGraph state machine
 │   ├── nodes.py              # Parse -> Verify -> Retry -> Prioritize
@@ -468,7 +477,7 @@ rakshak-edge/
 │   ├── state.py              # Graph state definition
 │   ├── config.py             # YAML config loader
 │   ├── llm.py                # Ollama + cloud LLM client
-│   └── main.py               # CLI entry point
+│   └── cli.py               # CLI entry point
 ├── scripts/                  # Data tools and evaluation
 │   ├── generate_synthetic.py # 53 India-focused synthetic SMS generator
 │   ├── annotate_synthetic.py # Golden annotation via cloud LLM (async, concurrent)

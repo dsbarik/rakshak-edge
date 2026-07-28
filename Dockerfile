@@ -6,4 +6,4 @@ COPY . .
 
 RUN pip install uv --quiet && uv sync --frozen && uv cache clean
 
-CMD ["uv", "run", "fastapi", "run", "api/main.py"]
+CMD ["uv", "run", "fastapi", "run"]
