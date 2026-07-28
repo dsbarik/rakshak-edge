@@ -57,7 +57,10 @@ async def root_triage(request: Request, message: str = Form(...)):
         return templates.TemplateResponse(
             request=request,
             name="index.html",
-            context={"result": result.model_dump(mode="json", by_alias=True), "original_message": message},
+            context={
+                "result": result.model_dump(mode="json", by_alias=True),
+                "original_message": message,
+            },
         )
     except Exception as e:
         return templates.TemplateResponse(

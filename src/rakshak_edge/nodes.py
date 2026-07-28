@@ -28,10 +28,12 @@ async def verify_node(state: TriageState) -> dict:
     )
 
     verify_chain = verify_prompt | llm
-    r = await verify_chain.ainvoke({
-        "message": state["message"],
-        "extracted": extracted,
-    })
+    r = await verify_chain.ainvoke(
+        {
+            "message": state["message"],
+            "extracted": extracted,
+        }
+    )
     text = r.content.strip()
     errors = (
         []

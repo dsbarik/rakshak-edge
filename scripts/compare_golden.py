@@ -62,7 +62,9 @@ async def triage_message(message: str) -> dict:
         }
 
 
-async def _compare_one(sample: dict, sem: asyncio.Semaphore, idx: int, total: int) -> dict:
+async def _compare_one(
+    sample: dict, sem: asyncio.Semaphore, idx: int, total: int
+) -> dict:
     """Run pipeline on one sample, return comparison result dict."""
     text = sample["input_text"]
     ref = sample["reference"]
@@ -92,7 +94,9 @@ async def compare(golden_path: Path):
     logger.info("Comparing %s samples from %s", len(samples), golden_path.name)
     logger.info(
         "Pipeline model: %s | Golden model: %s (concurrency=%s)",
-        pipeline_model, golden["model"], _CONCURRENCY,
+        pipeline_model,
+        golden["model"],
+        _CONCURRENCY,
     )
 
     sem = asyncio.Semaphore(_CONCURRENCY)
@@ -135,12 +139,14 @@ async def compare(golden_path: Path):
             e_intent += 1
             s_intent += 1
         else:
-            intent_diffs.append({
-                "text": text[:80],
-                "pipeline": pipe["intent"],
-                "ref": r["ref"]["intent"],
-                "retries": pipe["retry_count"],
-            })
+            intent_diffs.append(
+                {
+                    "text": text[:80],
+                    "pipeline": pipe["intent"],
+                    "ref": r["ref"]["intent"],
+                    "retries": pipe["retry_count"],
+                }
+            )
 
         # Hazards
         h_exact = pipe["hazards"] == ref_h
@@ -150,13 +156,15 @@ async def compare(golden_path: Path):
         if h_subset:
             s_hazard += 1
         if not h_subset:
-            hazard_diffs.append({
-                "text": text[:80],
-                "pipeline": sorted(pipe["hazards"]),
-                "ref": sorted(ref_h),
-                "subset": h_subset,
-                "retries": pipe["retry_count"],
-            })
+            hazard_diffs.append(
+                {
+                    "text": text[:80],
+                    "pipeline": sorted(pipe["hazards"]),
+                    "ref": sorted(ref_h),
+                    "subset": h_subset,
+                    "retries": pipe["retry_count"],
+                }
+            )
 
         for h in pipe["hazards"]:
             if h in ref_h:
@@ -175,13 +183,15 @@ async def compare(golden_path: Path):
         if r_subset:
             s_resource += 1
         if not r_subset:
-            resource_diffs.append({
-                "text": text[:80],
-                "pipeline": sorted(pipe["resources"]),
-                "ref": sorted(ref_r),
-                "subset": r_subset,
-                "retries": pipe["retry_count"],
-            })
+            resource_diffs.append(
+                {
+                    "text": text[:80],
+                    "pipeline": sorted(pipe["resources"]),
+                    "ref": sorted(ref_r),
+                    "subset": r_subset,
+                    "retries": pipe["retry_count"],
+                }
+            )
 
         for r_cat in pipe["resources"]:
             if r_cat in ref_r:
@@ -233,7 +243,9 @@ async def compare(golden_path: Path):
 
     if resource_tp or resource_fp or resource_fn:
         print("\n--- Resource per-category ---")
-        all_r_types = sorted(set(list(resource_tp) + list(resource_fp) + list(resource_fn)))
+        all_r_types = sorted(
+            set(list(resource_tp) + list(resource_fp) + list(resource_fn))
+        )
         print(f"  {'Type':25s} {'TP':>3} {'FP':>3} {'FN':>3} {'Prec':>5} {'Rec':>5}")
         for rt in all_r_types:
             tp = resource_tp.get(rt, 0)
@@ -246,19 +258,25 @@ async def compare(golden_path: Path):
     if intent_diffs:
         print(f"\n--- Intent disagreements ({len(intent_diffs)}) ---")
         for d in intent_diffs:
-            print(f"  pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}")
+            print(
+                f"  pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}"
+            )
 
     if hazard_diffs:
         print(f"\n--- Hazard disagreements ({len(hazard_diffs)}) ---")
         for d in hazard_diffs:
             subset_label = "subset✓" if d["subset"] else "subset✗"
-            print(f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}")
+            print(
+                f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}"
+            )
 
     if resource_diffs:
         print(f"\n--- Resource disagreements ({len(resource_diffs)}) ---")
         for d in resource_diffs[:8]:
             subset_label = "subset✓" if d["subset"] else "subset✗"
-            print(f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}")
+            print(
+                f"  [{subset_label}] pipeline={d['pipeline']} ref={d['ref']} (r={d['retries']}) | {d['text']}"
+            )
         if len(resource_diffs) > 8:
             print(f"  ... and {len(resource_diffs) - 8} more")
 
@@ -270,24 +288,42 @@ async def compare(golden_path: Path):
         "golden_model": golden.get("model", "unknown"),
         "total": total,
         "exact_match": {
-            "intent": e_intent, "intent_pct": pct(e_intent),
-            "hazard": e_hazard, "hazard_pct": pct(e_hazard),
-            "resource": e_resource, "resource_pct": pct(e_resource),
+            "intent": e_intent,
+            "intent_pct": pct(e_intent),
+            "hazard": e_hazard,
+            "hazard_pct": pct(e_hazard),
+            "resource": e_resource,
+            "resource_pct": pct(e_resource),
         },
         "subset_match": {
-            "intent": s_intent, "intent_pct": pct(s_intent),
-            "hazard": s_hazard, "hazard_pct": pct(s_hazard),
-            "resource": s_resource, "resource_pct": pct(s_resource),
+            "intent": s_intent,
+            "intent_pct": pct(s_intent),
+            "hazard": s_hazard,
+            "hazard_pct": pct(s_hazard),
+            "resource": s_resource,
+            "resource_pct": pct(s_resource),
         },
         "hazard_category": {
             k: {
                 "tp": hazard_tp.get(k, 0),
                 "fp": hazard_fp.get(k, 0),
                 "fn": hazard_fn.get(k, 0),
-                "precision": round(hazard_tp.get(k, 0) / (hazard_tp.get(k, 0) + hazard_fp.get(k, 0)) * 100, 1)
-                if (hazard_tp.get(k, 0) + hazard_fp.get(k, 0)) > 0 else 0,
-                "recall": round(hazard_tp.get(k, 0) / (hazard_tp.get(k, 0) + hazard_fn.get(k, 0)) * 100, 1)
-                if (hazard_tp.get(k, 0) + hazard_fn.get(k, 0)) > 0 else 0,
+                "precision": round(
+                    hazard_tp.get(k, 0)
+                    / (hazard_tp.get(k, 0) + hazard_fp.get(k, 0))
+                    * 100,
+                    1,
+                )
+                if (hazard_tp.get(k, 0) + hazard_fp.get(k, 0)) > 0
+                else 0,
+                "recall": round(
+                    hazard_tp.get(k, 0)
+                    / (hazard_tp.get(k, 0) + hazard_fn.get(k, 0))
+                    * 100,
+                    1,
+                )
+                if (hazard_tp.get(k, 0) + hazard_fn.get(k, 0)) > 0
+                else 0,
             }
             for k in sorted(set(list(hazard_tp) + list(hazard_fp) + list(hazard_fn)))
         },
@@ -296,12 +332,26 @@ async def compare(golden_path: Path):
                 "tp": resource_tp.get(k, 0),
                 "fp": resource_fp.get(k, 0),
                 "fn": resource_fn.get(k, 0),
-                "precision": round(resource_tp.get(k, 0) / (resource_tp.get(k, 0) + resource_fp.get(k, 0)) * 100, 1)
-                if (resource_tp.get(k, 0) + resource_fp.get(k, 0)) > 0 else 0,
-                "recall": round(resource_tp.get(k, 0) / (resource_tp.get(k, 0) + resource_fn.get(k, 0)) * 100, 1)
-                if (resource_tp.get(k, 0) + resource_fn.get(k, 0)) > 0 else 0,
+                "precision": round(
+                    resource_tp.get(k, 0)
+                    / (resource_tp.get(k, 0) + resource_fp.get(k, 0))
+                    * 100,
+                    1,
+                )
+                if (resource_tp.get(k, 0) + resource_fp.get(k, 0)) > 0
+                else 0,
+                "recall": round(
+                    resource_tp.get(k, 0)
+                    / (resource_tp.get(k, 0) + resource_fn.get(k, 0))
+                    * 100,
+                    1,
+                )
+                if (resource_tp.get(k, 0) + resource_fn.get(k, 0)) > 0
+                else 0,
             }
-            for k in sorted(set(list(resource_tp) + list(resource_fp) + list(resource_fn)))
+            for k in sorted(
+                set(list(resource_tp) + list(resource_fp) + list(resource_fn))
+            )
         },
         "avg_retries": round(avg_retries, 2),
         "messages_with_retries": msgs_with_retries,

@@ -90,12 +90,16 @@ Valid intent values are ONLY: REQUEST, OFFER, OTHER.
 - List each issue, one per line. Be brief.
 - If correct, respond with exactly: NONE"""
 
-final_prompt = ChatPromptTemplate([
-    ("system", TRIAGE_SYSTEM_PROMPT),
-    ("user", "Message: {input_text}"),
-])
+final_prompt = ChatPromptTemplate(
+    [
+        ("system", TRIAGE_SYSTEM_PROMPT),
+        ("user", "Message: {input_text}"),
+    ]
+)
 
-verify_prompt = ChatPromptTemplate([
-    ("system", VERIFY_SYSTEM_PROMPT),
-    ("user", "Original message: {message}\n\nExtracted data:\n{extracted}"),
-])
+verify_prompt = ChatPromptTemplate(
+    [
+        ("system", VERIFY_SYSTEM_PROMPT),
+        ("user", "Original message: {message}\n\nExtracted data:\n{extracted}"),
+    ]
+)

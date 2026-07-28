@@ -107,10 +107,12 @@ Rules:
 
 # ── Prompt template (same pattern as nodes.py) ──────────────────────
 
-ANNOTATION_CHAIN = ChatPromptTemplate.from_messages([
-    ("system", ANNOTATION_PROMPT),
-    ("user", "Message: {message}"),
-])
+ANNOTATION_CHAIN = ChatPromptTemplate.from_messages(
+    [
+        ("system", ANNOTATION_PROMPT),
+        ("user", "Message: {message}"),
+    ]
+)
 
 
 # ── File services ────────────────────────────────────────────────────
@@ -171,11 +173,14 @@ async def annotate_batch(
         try:
             logger.info("[%d/%d] %s", idx, len(samples), text[:80])
             annotation = await annotate_one(llm, text, sem)
-            gathered[idx - 1] = (idx, {
-                "input_text": text,
-                "reference": annotation,
-                "reference_hints": hints,
-            })
+            gathered[idx - 1] = (
+                idx,
+                {
+                    "input_text": text,
+                    "reference": annotation,
+                    "reference_hints": hints,
+                },
+            )
         except Exception as e:
             logger.error("[%d/%d] Failed: %s", idx, len(samples), e)
             gathered[idx - 1] = None
@@ -190,14 +195,18 @@ async def annotate_batch(
     results = [r for _, r in results]
 
     elapsed = time.time() - start
-    logger.info("Finished: %d annotated, %d errors in %.1fs", len(results), len(errors), elapsed)
+    logger.info(
+        "Finished: %d annotated, %d errors in %.1fs", len(results), len(errors), elapsed
+    )
     return results, errors
 
 
 # ── Golden dataset formatting & IO ───────────────────────────────────
 
 
-def to_golden_json(results: list[dict], errors: list[dict], model: str = "minimax-m3:cloud") -> dict:
+def to_golden_json(
+    results: list[dict], errors: list[dict], model: str = "minimax-m3:cloud"
+) -> dict:
     """Convert annotation results into golden dataset format (pure)."""
     return {
         "model": model,
@@ -225,6 +234,7 @@ def save_golden(data: dict, directory: Path = GOLDEN_DIR) -> Path:
 def create_llm(model: str, temperature: float = 0.0) -> ChatOllama:
     """Create a ChatOllama instance. Delegates to the project's shared get_llm()."""
     from rakshak_edge.llm import get_llm
+
     return get_llm(model=model, temperature=temperature)
 
 
@@ -234,10 +244,23 @@ def create_llm(model: str, temperature: float = 0.0) -> ChatOllama:
 async def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description="Annotate synthetic messages concurrently")
-    parser.add_argument("--limit", type=int, help="Number of messages to annotate (default: all)")
-    parser.add_argument("--model", default="minimax-m3:cloud", help="Ollama model (default: minimax-m3:cloud)")
-    parser.add_argument("--concurrency", type=int, default=DEFAULT_CONCURRENCY, help="Concurrent API calls (default: 4)")
+    parser = argparse.ArgumentParser(
+        description="Annotate synthetic messages concurrently"
+    )
+    parser.add_argument(
+        "--limit", type=int, help="Number of messages to annotate (default: all)"
+    )
+    parser.add_argument(
+        "--model",
+        default="minimax-m3:cloud",
+        help="Ollama model (default: minimax-m3:cloud)",
+    )
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=DEFAULT_CONCURRENCY,
+        help="Concurrent API calls (default: 4)",
+    )
     args = parser.parse_args()
 
     llm = create_llm(args.model)
@@ -245,10 +268,12 @@ async def main():
     samples = load_samples(synthetic_path)
 
     if args.limit:
-        samples = samples[:args.limit]
+        samples = samples[: args.limit]
 
     print(f"Starting annotation of {len(samples)} messages with {args.model}...")
-    print(f"Concurrency: {args.concurrency} — this will be ~{args.concurrency}x faster than sequential.")
+    print(
+        f"Concurrency: {args.concurrency} — this will be ~{args.concurrency}x faster than sequential."
+    )
     print("Make sure you are signed in: ollama signin")
 
     results, errors = await annotate_batch(llm, samples, concurrency=args.concurrency)

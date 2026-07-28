@@ -12,7 +12,9 @@ def get_llm(model: str | None = None, temperature: float | None = None) -> ChatO
     """
     kwargs: dict = {
         "model": model or settings["llm"]["model_name"],
-        "temperature": temperature if temperature is not None else settings["llm"]["temperature"],
+        "temperature": temperature
+        if temperature is not None
+        else settings["llm"]["temperature"],
     }
     if settings.get("api_key"):
         kwargs["api_key"] = settings["api_key"]
